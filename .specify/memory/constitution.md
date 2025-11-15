@@ -1,9 +1,16 @@
 <!--
-Sync Impact Report - Constitution v1.0.0
+Sync Impact Report - Constitution v1.1.0
 ========================================
-Version Change: INITIAL → 1.0.0 (Initial constitution ratification)
+Version Change: 1.0.0 → 1.1.0 (Deep validation enhancement)
 Date: 2025-11-15
 
+Principles Added in v1.1.0:
+- VIII. Repository Boundaries and Exclusions (NEW)
+
+Principles Updated in v1.1.0:
+- VII. Best Practices for Rust Fullstack - Added acknowledgment of React version's partial state and Flowise legacy
+
+Previous Version (v1.0.0):
 Principles Added:
 - I. Monorepo with Rust Workspace
 - II. Package Structure Convention  
@@ -98,8 +105,21 @@ Implementation MUST follow Rust ecosystem best practices:
 - UI components following Material Design principles
 - Do NOT blindly port bad patterns from the React implementation - analyze and improve
 - Consult the reference implementation at https://github.com/teknokomo/universo-platformo-react for concept ONLY
+- Note: The React implementation is partially complete and contains legacy Flowise code; avoid porting these incomplete or legacy sections
 
 **Rationale**: Each technology stack has its own best practices. While the React implementation provides the conceptual foundation, this Rust implementation must use patterns appropriate to the Rust ecosystem for maintainability and performance.
+
+### VIII. Repository Boundaries and Exclusions
+
+The following MUST NOT be included in this repository:
+- **docs/ directory**: Documentation will be hosted in a separate repository (docs.universo.pro). Do NOT create a `docs/` folder in this repository.
+- **AI Agent Configuration Files**: Users will create their own AI agent rules and configuration files as needed. Do NOT pre-create `.github/agents/` or similar directories for AI instructions.
+
+**Exceptions**:
+- `.github/instructions/` for development guidelines IS allowed and required (github-issues.md, github-labels.md, github-pr.md, i18n-docs.md)
+- `.specify/` directory for specification workflow IS allowed and required
+
+**Rationale**: Keeping documentation and AI agent configurations separate allows them to evolve independently and prevents repository bloat. The React implementation's inclusion of these was identified as a pattern NOT to replicate.
 
 ## Technology Stack
 
@@ -165,4 +185,4 @@ Implementation MUST follow Rust ecosystem best practices:
 
 **Runtime Guidance**: Use `.github/instructions/*.md` files for specific runtime development guidance on GitHub workflows, documentation standards, and labeling conventions.
 
-**Version**: 1.0.0 | **Ratified**: 2025-11-15 | **Last Amended**: 2025-11-15
+**Version**: 1.1.0 | **Ratified**: 2025-11-15 | **Last Amended**: 2025-11-15

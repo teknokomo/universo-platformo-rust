@@ -1,0 +1,52 @@
+[workspace]
+resolver = "2"
+
+# Members will be added as packages are created
+# Example:
+# members = [
+#     "packages/clusters-frt",
+#     "packages/clusters-srv",
+# ]
+members = []
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+authors = ["Universo Platformo Team <universo.pro@yandex.com>"]
+license = "Omsk-Open-License"
+repository = "https://github.com/teknokomo/universo-platformo-rust"
+
+[workspace.dependencies]
+# Common dependencies will be defined here for consistency across packages
+# Frontend dependencies (Yew ecosystem)
+# yew = "0.21"
+# yew-router = "0.18"
+
+# Backend dependencies (Actix ecosystem)
+# actix-web = "4.0"
+# actix-rt = "2.0"
+
+# Database
+# tokio-postgres = "0.7"
+# sqlx = "0.7"
+
+# Serialization
+# serde = { version = "1.0", features = ["derive"] }
+# serde_json = "1.0"
+
+# Utilities
+# chrono = "0.4"
+# uuid = { version = "1.0", features = ["v4", "serde"] }
+
+[profile.dev]
+opt-level = 0
+debug = true
+
+[profile.release]
+opt-level = 3
+lto = true
+codegen-units = 1
+strip = true
+
+[profile.dev.package."*"]
+opt-level = 2
