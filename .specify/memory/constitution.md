@@ -1,50 +1,168 @@
-# [PROJECT_NAME] Constitution
-<!-- Example: Spec Constitution, TaskFlow Constitution, etc. -->
+<!--
+Sync Impact Report - Constitution v1.0.0
+========================================
+Version Change: INITIAL → 1.0.0 (Initial constitution ratification)
+Date: 2025-11-15
+
+Principles Added:
+- I. Monorepo with Rust Workspace
+- II. Package Structure Convention  
+- III. Bilingual Documentation (NON-NEGOTIABLE)
+- IV. Database Flexibility
+- V. Issue-Driven Development
+- VI. Specification-First Approach
+- VII. Best Practices for Rust Fullstack
+
+Sections Added:
+- Technology Stack
+- Development Workflow
+- Governance
+
+Templates Status:
+✅ plan-template.md - Reviewed, no changes needed (generic structure)
+✅ spec-template.md - Reviewed, no changes needed (generic structure)
+✅ tasks-template.md - Reviewed, no changes needed (generic structure)
+
+Follow-up TODOs:
+- None - all placeholders filled
+-->
+
+# Universo Platformo Rust Constitution
 
 ## Core Principles
 
-### [PRINCIPLE_1_NAME]
-<!-- Example: I. Library-First -->
-[PRINCIPLE_1_DESCRIPTION]
-<!-- Example: Every feature starts as a standalone library; Libraries must be self-contained, independently testable, documented; Clear purpose required - no organizational-only libraries -->
+### I. Monorepo with Rust Workspace
 
-### [PRINCIPLE_2_NAME]
-<!-- Example: II. CLI Interface -->
-[PRINCIPLE_2_DESCRIPTION]
-<!-- Example: Every library exposes functionality via CLI; Text in/out protocol: stdin/args → stdout, errors → stderr; Support JSON + human-readable formats -->
+The project MUST be organized as a monorepo using Cargo workspace management. All packages MUST be defined in the root `Cargo.toml` workspace configuration. This enables unified dependency management, consistent tooling, and efficient cross-package development.
 
-### [PRINCIPLE_3_NAME]
-<!-- Example: III. Test-First (NON-NEGOTIABLE) -->
-[PRINCIPLE_3_DESCRIPTION]
-<!-- Example: TDD mandatory: Tests written → User approved → Tests fail → Then implement; Red-Green-Refactor cycle strictly enforced -->
+**Rationale**: Monorepo structure facilitates code sharing, simplifies dependency management, and enables atomic cross-package changes. Cargo workspaces provide native Rust tooling support for this pattern.
 
-### [PRINCIPLE_4_NAME]
-<!-- Example: IV. Integration Testing -->
-[PRINCIPLE_4_DESCRIPTION]
-<!-- Example: Focus areas requiring integration tests: New library contract tests, Contract changes, Inter-service communication, Shared schemas -->
+### II. Package Structure Convention
 
-### [PRINCIPLE_5_NAME]
-<!-- Example: V. Observability, VI. Versioning & Breaking Changes, VII. Simplicity -->
-[PRINCIPLE_5_DESCRIPTION]
-<!-- Example: Text I/O ensures debuggability; Structured logging required; Or: MAJOR.MINOR.BUILD format; Or: Start simple, YAGNI principles -->
+All packages MUST be organized in the `packages/` directory following these rules:
+- Packages requiring both frontend and backend MUST be split into separate packages with `-frt` (frontend) and `-srv` (server/backend) suffixes
+- Example: `packages/clusters-frt` and `packages/clusters-srv`
+- Each package MUST contain a root `base/` directory to accommodate future alternative implementations
+- Package naming MUST be lowercase with hyphens as separators
 
-## [SECTION_2_NAME]
-<!-- Example: Additional Constraints, Security Requirements, Performance Standards, etc. -->
+**Rationale**: Clear separation of frontend and backend code enables independent deployment and testing. The `base/` directory pattern prepares the codebase for future technology stack alternatives while maintaining a consistent interface.
 
-[SECTION_2_CONTENT]
-<!-- Example: Technology stack requirements, compliance standards, deployment policies, etc. -->
+### III. Bilingual Documentation (NON-NEGOTIABLE)
 
-## [SECTION_3_NAME]
-<!-- Example: Development Workflow, Review Process, Quality Gates, etc. -->
+All documentation MUST be provided in both English and Russian with identical structure:
+- English is the primary standard and MUST be created first
+- Russian translation MUST have the same content, structure, and line count as English version
+- README files MUST use the pattern: `README.md` (English) and `README-RU.md` (Russian)
+- GitHub Issues and Pull Requests MUST include both English and Russian content using `<details><summary>In Russian</summary>` spoiler tags
+- The spoiler tag MUST be exactly `<summary>In Russian</summary>` - no variations allowed
 
-[SECTION_3_CONTENT]
-<!-- Example: Code review requirements, testing gates, deployment approval process, etc. -->
+**Rationale**: The project serves both English and Russian-speaking communities. Maintaining identical structure ensures no information loss across languages and simplifies maintenance.
+
+### IV. Database Flexibility
+
+Database layer MUST be designed for abstraction:
+- Primary focus on Supabase integration initially
+- Architecture MUST support future addition of other database systems (PostgreSQL, MySQL, etc.)
+- Database access MUST be encapsulated through trait-based abstractions
+- No direct database-specific code in business logic
+
+**Rationale**: While Supabase is the initial choice, the platform's evolution may require supporting multiple database backends. Designing for flexibility from the start prevents costly refactoring later.
+
+### V. Issue-Driven Development
+
+All development work MUST follow the issue-driven workflow:
+- Create GitHub Issue BEFORE implementing any feature or fix
+- Issues MUST follow the format specified in `.github/instructions/github-issues.md`
+- Issues MUST be labeled according to `.github/instructions/github-labels.md`
+- Pull Requests MUST reference their corresponding issue and follow `.github/instructions/github-pr.md`
+
+**Rationale**: Issue-driven development provides traceability, enables planning, and creates a searchable history of decisions and implementations.
+
+### VI. Specification-First Approach
+
+Features MUST be specified before implementation:
+- Create specification documents in `specs/` directory before coding
+- Specifications MUST include user stories, requirements, and success criteria
+- Use the specification template from `.specify/templates/spec-template.md`
+- Implementation MUST follow the approved specification
+
+**Rationale**: Specification-first approach ensures shared understanding, reduces rework, and provides clear acceptance criteria for validation.
+
+### VII. Best Practices for Rust Fullstack
+
+Implementation MUST follow Rust ecosystem best practices:
+- Use idiomatic Rust patterns and conventions
+- Leverage Yew for frontend (WebAssembly)
+- Leverage Actix Web for backend
+- Authentication using Rust-native solutions (compatible with Passport.js patterns from original)
+- UI components following Material Design principles
+- Do NOT blindly port bad patterns from the React implementation - analyze and improve
+- Consult the reference implementation at https://github.com/teknokomo/universo-platformo-react for concept ONLY
+
+**Rationale**: Each technology stack has its own best practices. While the React implementation provides the conceptual foundation, this Rust implementation must use patterns appropriate to the Rust ecosystem for maintainability and performance.
+
+## Technology Stack
+
+**Frontend**: 
+- Language: Rust + WebAssembly
+- Framework: Yew
+- UI Library: Material Design principles (Rust implementations)
+
+**Backend**:
+- Language: Rust
+- Framework: Actix Web
+- Database: Supabase (primary), with abstraction for future DBMS support
+- Authentication: Rust-native auth solutions (Passport.js pattern compatibility)
+
+**Monorepo Management**: Cargo workspaces
+
+**Quality Tools**:
+- Formatter: `rustfmt`
+- Linter: `clippy`
+- Testing: `cargo test`
+
+## Development Workflow
+
+1. **Planning Phase**:
+   - Analyze requirements and create GitHub Issue
+   - Write specification in `specs/[###-feature-name]/spec.md`
+   - Get specification approval before implementation
+
+2. **Implementation Phase**:
+   - Create feature branch from main
+   - Implement according to specification
+   - Write tests alongside code
+   - Update documentation (English first, then Russian)
+
+3. **Quality Gates**:
+   - All code MUST pass `cargo clippy` with no warnings
+   - All code MUST be formatted with `rustfmt`
+   - All tests MUST pass with `cargo test`
+   - Documentation MUST be bilingual with identical structure
+
+4. **Review & Merge**:
+   - Create Pull Request following `.github/instructions/github-pr.md`
+   - PR MUST reference the corresponding Issue
+   - PR MUST include both English and Russian descriptions
+   - PR MUST pass all CI checks before merge
 
 ## Governance
-<!-- Example: Constitution supersedes all other practices; Amendments require documentation, approval, migration plan -->
 
-[GOVERNANCE_RULES]
-<!-- Example: All PRs/reviews must verify compliance; Complexity must be justified; Use [GUIDANCE_FILE] for runtime development guidance -->
+**Constitutional Authority**: This constitution supersedes all other development practices and guidelines. In case of conflict between this document and other guidance, this constitution takes precedence.
 
-**Version**: [CONSTITUTION_VERSION] | **Ratified**: [RATIFICATION_DATE] | **Last Amended**: [LAST_AMENDED_DATE]
-<!-- Example: Version: 2.1.1 | Ratified: 2025-06-13 | Last Amended: 2025-07-16 -->
+**Amendments**: 
+- Constitution amendments require explicit documentation of the change rationale
+- Version MUST be incremented following semantic versioning:
+  - MAJOR: Backward incompatible principle removals or redefinitions
+  - MINOR: New principles added or materially expanded guidance
+  - PATCH: Clarifications, wording fixes, non-semantic refinements
+
+**Compliance**:
+- All Pull Requests MUST verify compliance with these principles
+- Complexity or exceptions MUST be explicitly justified in PR descriptions
+- Template files in `.specify/templates/` provide implementation guidance
+- Agent instructions in `.github/agents/` MUST align with these principles
+
+**Runtime Guidance**: Use `.github/instructions/*.md` files for specific runtime development guidance on GitHub workflows, documentation standards, and labeling conventions.
+
+**Version**: 1.0.0 | **Ratified**: 2025-11-15 | **Last Amended**: 2025-11-15
