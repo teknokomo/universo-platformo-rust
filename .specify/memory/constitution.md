@@ -1,11 +1,16 @@
 <!--
-Sync Impact Report - Constitution v1.1.0
+Sync Impact Report - Constitution v1.2.0
 ========================================
-Version Change: 1.0.0 → 1.1.0 (Deep validation enhancement)
-Date: 2025-11-15
+Version Change: 1.1.0 → 1.2.0 (Non-functional requirements and integration contracts)
+Date: 2025-11-16
+
+Principles Added in v1.2.0:
+- IX. Non-Functional Requirements Priority (NEW)
+- X. Integration Contracts (NEW)
+- XI. Risk Management (NEW)
 
 Principles Added in v1.1.0:
-- VIII. Repository Boundaries and Exclusions (NEW)
+- VIII. Repository Boundaries and Exclusions
 
 Principles Updated in v1.1.0:
 - VII. Best Practices for Rust Fullstack - Added acknowledgment of React version's partial state and Flowise legacy
@@ -185,4 +190,34 @@ The following MUST NOT be included in this repository:
 
 **Runtime Guidance**: Use `.github/instructions/*.md` files for specific runtime development guidance on GitHub workflows, documentation standards, and labeling conventions.
 
-**Version**: 1.1.0 | **Ratified**: 2025-11-15 | **Last Amended**: 2025-11-15
+### IX. Non-Functional Requirements Priority
+
+Non-functional requirements (performance, security, accessibility, maintainability) MUST be treated as first-class requirements alongside functional requirements:
+- Performance targets MUST be quantified (build time, response time, bundle size)
+- Security requirements MUST be explicit (authentication, encryption, vulnerability scanning)
+- Accessibility MUST meet WCAG 2.1 Level AA standards
+- Code quality MUST be enforced through automated tools (clippy, rustfmt, test coverage)
+
+**Rationale**: Non-functional requirements are often neglected until late in development, leading to costly refactoring. Specifying them early ensures they are designed into the architecture from the start.
+
+### X. Integration Contracts
+
+Frontend and backend packages MUST communicate through explicitly defined API contracts:
+- Contracts MUST be defined in shared type packages
+- API endpoints MUST follow REST conventions
+- Request/response schemas MUST use serde-compatible Rust types
+- Breaking changes MUST follow semantic versioning
+
+**Rationale**: Explicit contracts prevent integration issues and enable independent frontend/backend development. Shared types ensure type safety across the stack.
+
+### XI. Risk Management
+
+All specifications MUST identify and document risks with mitigation strategies:
+- Probability and impact assessment for each risk
+- Proactive mitigation strategies
+- Contingency plans for high-impact risks
+- Regular risk review and updates
+
+**Rationale**: Proactive risk management prevents project delays and failures. Documented risks enable informed decision-making and resource allocation.
+
+**Version**: 1.2.0 | **Ratified**: 2025-11-15 | **Last Amended**: 2025-11-16
