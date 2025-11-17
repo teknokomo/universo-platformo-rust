@@ -432,8 +432,214 @@ packages/clusters-srv/
 
 ---
 
+### 11. Rust Fullstack Architecture Patterns (2024 Best Practices)
+
+**Decision**: Follow modern fullstack Rust patterns with separation of concerns and shared types
+
+**Rationale**:
+- Recent industry experience shows benefits of multi-project workspaces separating frontend/backend
+- Shared type library crate minimizes serialization errors and improves type safety
+- Type-safe communication via shared Rust structs eliminates entire classes of bugs
+- Component-based architecture in Yew mirrors successful React patterns
+
+**Best Practices from Industry (2024)**:
+- **Multi-Project Workspace**: Use Cargo workspaces to separate `/backend`, `/frontend` into distinct projects
+- **Shared Types/DTOs**: Create shared library crate for API request/response structs
+- **State Management**: Use Yewdux or custom context providers for global app state
+- **API Integration**: Use reqwest via WASM with Serde for type-safe serialization
+- **Async Everything**: Make endpoints async in Actix, leverage actor model for high concurrency
+- **Validation**: Use Serde + validator crates for input validation
+- **Docker-Compose**: Standardize dev/prod environments with Compose
+- **Hot Reload**: Use Trunk for live-reloading Yew apps during development
+
+**Cargo Workspace Management**:
+- Define all packages in root `Cargo.toml` `[workspace]` section
+- Use `[workspace.dependencies]` for shared external dependencies
+- Path dependencies for internal crates: `foo = { path = "../foo" }`
+- Keep `Cargo.lock` at workspace level for consistency
+- Selective CI builds: Only rebuild/test affected crates for large codebases
+
+**Alternatives Considered**:
+- Multiple independent repositories: Rejected due to dependency management complexity
+- Git submodules: Rejected due to poor ergonomics and CI/CD complications
+
+**References**:
+- [CodevoWeb Fullstack Rust Tutorial](https://codevoweb.com/build-full-stack-app-with-rust-yew-and-actix-web/)
+- [Security Union Yew-Actix Template](https://github.com/security-union/yew-actix-template)
+- [Earthly Cargo Workspace Guide](https://earthly.dev/blog/cargo-workspace-crates/)
+- [Cargo Official Workspaces Documentation](https://doc.rust-lang.org/book/ch14-03-cargo-workspaces.html)
+
+---
+
+### 12. WASM Optimization Techniques (2024)
+
+**Decision**: Implement comprehensive WASM optimization pipeline
+
+**Rationale**:
+- Bundle size directly impacts user experience and loading times
+- Modern tooling can achieve 20-30% size reduction with proper optimization
+- Optimization techniques stack multiplicatively for best results
+- Rust produces smaller WASM binaries compared to other languages
+
+**Optimization Strategy**:
+1. **Compiler Flags**: Use `-Oz` for minimum binary size (vs `-O3` for performance)
+2. **Post-Processing with wasm-opt**: Run `wasm-opt -Oz -o output.wasm input.wasm` (Binaryen)
+3. **Dead Code Elimination**: Leverage Rust's built-in DCE with `cargo build --release`
+4. **Memory Management**: Minimize allocations, use AddressSanitizer to catch leaks
+5. **Pre-initialization with Wizer**: Move heavy startup logic to build time
+6. **Link-Time Optimization (LTO)**: Enable in release profile for aggressive optimization
+7. **Strip Debug Info**: Remove debugging symbols in production builds
+
+**Trunk Integration**:
+- Trunk integrates `wasm-bindgen` and `wasm-opt` out of the box
+- Always use release builds: `trunk build --release`
+- Configure additional optimization in `Trunk.toml` if needed
+- Remove unnecessary dependencies to reduce bundle size
+
+**Expected Results**:
+- Compiler optimization: 10-30% reduction
+- wasm-opt post-processing: 20-30% additional reduction
+- Dead code elimination: 10-20% reduction
+- Total: Up to 60% size reduction from naive builds
+
+**Alternatives Considered**:
+- Skip optimization for faster builds: Rejected for production
+- Custom optimization pipelines: Rejected in favor of standard tooling
+
+**References**:
+- [KodeJungle WASM Optimization Guide](https://kodejungle.org/blog/webassembly-wasm-optimization)
+- [Compile7 WASM Optimization Strategies](https://compile7.org/decompile/webassembly-optimization-strategies)
+- [CommandMasters wasm-opt Examples](https://commandmasters.com/commands/wasm-opt-common/)
+- [KodeKloud WASM Optimization](https://notes.kodekloud.com/docs/Exploring-WebAssembly-WASM/Compiling-to-WebAssembly/Optimizing-Compiled-WASM-code)
+
+---
+
+### 13. Database Abstraction with Repository Pattern
+
+**Decision**: Implement repository pattern with SQLx and trait-based abstractions
+
+**Rationale**:
+- Repository pattern provides clean separation of data access from business logic
+- Traits enable dependency injection and testing with mocks
+- SQLx provides compile-time query verification
+- Pattern supports future addition of alternative database backends
+
+**Repository Pattern Structure**:
+```rust
+#[async_trait]
+pub trait ClusterRepository {
+    async fn create(&self, cluster: NewCluster) -> Result<Cluster, DbError>;
+    async fn find_by_id(&self, id: Uuid) -> Result<Option<Cluster>, DbError>;
+    async fn list(&self, pagination: Pagination) -> Result<Vec<Cluster>, DbError>;
+    async fn update(&self, id: Uuid, updates: ClusterUpdate) -> Result<Cluster, DbError>;
+    async fn delete(&self, id: Uuid) -> Result<(), DbError>;
+}
+
+struct SqlxClusterRepository {
+    pool: PgPool,
+}
+
+impl ClusterRepository for SqlxClusterRepository {
+    // Implementation using SQLx
+}
+```
+
+**Best Practices**:
+- Define repository traits for each entity
+- Use SQLx `query_as!` macro for compile-time type checking
+- Share connection pool via `actix-web::web::Data<PgPool>`
+- Implement custom error types wrapping database errors
+- Add instrumentation with `tracing` spans for debugging
+
+**SeaORM Alternative**:
+- Higher-level ORM abstraction built on SQLx
+- Derive macros for entities: `#[derive(DeriveEntityModel)]`
+- Built-in traits: `EntityTrait`, `ModelTrait`, `ActiveModelTrait`
+- Good for rapid development, less boilerplate
+- Trade-off: Less control over generated queries
+
+**Alternatives Considered**:
+- Diesel: Rejected due to sync-only nature (async support incomplete)
+- SeaORM: Considered for future, currently prefer SQLx for flexibility
+- Direct SQL: Rejected due to lack of type safety
+
+**References**:
+- [SQLx Repository Traits Documentation](https://docs.rs/sqlx-utils/latest/sqlx_utils/traits/repository/trait.Repository.html)
+- [StudyRaid Repository Pattern Guide](https://app.studyraid.com/en/read/14938/515218/implementing-repository-patterns-with-sqlx)
+- [SeaORM Documentation](https://www.sea-ql.org/SeaORM/docs/install-and-config/connection/)
+- [Shuttle.dev Rust ORMs Comparison](https://www.shuttle.dev/blog/2024/01/16/best-orm-rust)
+
+---
+
+### 14. Material Design for Yew - Current State (2024)
+
+**Decision**: Use yew-components (Angular Rust) or build custom components following Material Design
+
+**Rationale**:
+- No mature, comprehensive Material Design library exists for Yew
+- Available options: yew-components and Material Yew provide basic coverage
+- Building custom components provides full control over implementation
+- Can extract learnings from React Material-UI implementation
+
+**Available Libraries**:
+
+1. **yew-components** (Angular Rust)
+   - Wrapper around Google's Material Design Components (MDC)
+   - Available on crates.io as `ymc`
+   - Supports all modern browsers
+   - Components: buttons, cards, dialogs, sliders, etc.
+   - Community contributions welcome
+
+2. **Material Yew**
+   - Exposes Material Web Components as Yew components
+   - Follows Google's Material Design guidelines
+   - Modern browser support
+
+**Custom Component Strategy**:
+- Build in `universo-ui-components` package
+- Follow Material Design 3 specifications
+- Core components: Button, TextField, Card, AppBar, Drawer, List, Dialog
+- Layout components: Grid, Flexbox wrappers
+- Form components: Input, Select, Checkbox, Radio, Switch
+- Accessibility: ARIA attributes, keyboard navigation, focus management
+- Styling: CSS Modules or `stylist` crate for scoped styles
+- Theming: CSS variables for colors, spacing, typography
+
+**Alternative UI Libraries** (non-Material):
+- Yew Styles: Own style framework
+- Rust Radix: Port of Radix for accessible UI
+- shadcn/ui (Yew port): Copy-pasteable components
+
+**Alternatives Considered**:
+- Patternfly: Rejected as Red Hat specific
+- Port Material-UI directly: Rejected due to complexity and JS dependencies
+- Use existing components as-is: Considered for rapid prototyping
+
+**References**:
+- [yew-components GitHub](https://github.com/angular-rust/yew-components)
+- [Material Yew](https://material-yew.rm.rs/)
+- [Material Design 3](https://m3.material.io/)
+- [Awesome Yew Components List](https://github.com/jetli/awesome-yew)
+
+---
+
 ## Summary
 
-All technical decisions are made with concrete rationale and alternatives considered. The technology stack (Rust, Yew, Actix Web, Supabase, SQLx, reqwest, fluent-rs) provides a solid foundation for building a performant, type-safe, accessible fullstack web platform. Shared infrastructure packages prevent code duplication and ensure consistency across domain features.
+All technical decisions are made with concrete rationale and alternatives considered. The technology stack (Rust, Yew, Actix Web, Supabase, SQLx, reqwest, fluent-rs) provides a solid foundation for building a performant, type-safe, accessible fullstack web platform.
+
+**Key Updates from 2024 Research**:
+- **Architecture**: Modern fullstack Rust patterns emphasize workspace separation and shared types
+- **Optimization**: WASM optimization can achieve 60% size reduction with proper tooling
+- **Database**: Repository pattern with SQLx provides flexibility and testability
+- **UI**: Custom Material Design components recommended due to limited library maturity
+- **Workspaces**: Centralized dependency management prevents version conflicts
+
+**Technology Validation**:
+- Yew + Actix Web is a proven combination with production templates available
+- SQLx provides superior type safety with compile-time query checking
+- Trunk offers best-in-class developer experience for WASM development
+- Community actively developing solutions (templates, libraries, best practices)
+
+Shared infrastructure packages prevent code duplication and ensure consistency across domain features. The chosen stack is battle-tested, actively maintained, and follows Rust ecosystem best practices.
 
 **Next Steps**: Proceed to Phase 1 to create data models, API contracts, and quickstart documentation.
