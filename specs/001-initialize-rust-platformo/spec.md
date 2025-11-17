@@ -117,6 +117,22 @@ As a Rust developer setting up the project, I need configuration files for Cargo
 - **FR-028**: WebAssembly target (wasm32-unknown-unknown) MUST be supported for all frontend packages
 - **FR-029**: Database abstraction layer MUST use trait-based design to support multiple DBMS implementations
 - **FR-030**: Authentication implementation MUST support session-based and token-based mechanisms compatible with Supabase auth
+- **FR-031**: Repository MUST include `universo-types` shared crate with all type definitions using serde traits
+- **FR-032**: Repository MUST include `universo-utils` shared crate with common utilities and UPDL processor
+- **FR-033**: Repository MUST include `universo-api-client` shared crate for centralized HTTP client using reqwest
+- **FR-034**: Repository MUST include `universo-i18n` shared crate for internationalization using fluent-rs or rust-i18n
+- **FR-035**: Repository MUST include `universo-ui-components` shared crate with Yew components following Material Design
+- **FR-036**: Domain packages (clusters, metaverses, etc.) MUST depend on shared infrastructure packages
+- **FR-037**: Shared packages MUST NOT depend on domain packages (unidirectional dependency)
+- **FR-038**: UPDL (Universal Platform Description Language) type definitions MUST be in `universo-types` crate
+- **FR-039**: UPDL processor for converting flow graphs to UPDL structures MUST be in `universo-utils` crate
+- **FR-040**: Template system interface MUST be defined as traits in `universo-utils` crate
+- **FR-041**: Template packages MUST convert UPDL structures to platform-specific implementations
+- **FR-042**: Template packages MUST generate deployable artifacts (HTML, JS, WASM)
+- **FR-043**: WASM build pipeline using `wasm-pack` or `trunk` MUST be documented and configured
+- **FR-044**: Asset handling strategy for SVG icons and images MUST be documented and implemented
+- **FR-045**: Development hot-reload with `cargo-watch` MUST be configured and documented
+
 
 ### Non-Functional Requirements
 
@@ -177,6 +193,81 @@ As a Rust developer setting up the project, I need configuration files for Cargo
 - **INT-011**: Database schema migrations MUST be managed through migration tools (e.g., sqlx migrations)
 - **INT-012**: All database queries MUST use parameterized queries to prevent SQL injection
 - **INT-013**: Database connection pooling MUST be implemented for performance and resource management
+
+### Shared Infrastructure Requirements
+
+#### Shared Package Architecture
+
+- **SHR-001**: `universo-types` crate MUST define all shared type definitions with serde Serialize and Deserialize traits
+- **SHR-002**: `universo-types` MUST include UPDL node structures, API contracts, database entities, and platform types
+- **SHR-003**: `universo-utils` crate MUST provide UPDL processor for converting flow graphs to UPDL
+- **SHR-004**: `universo-utils` MUST include template interface traits and common utility functions
+- **SHR-005**: `universo-api-client` crate MUST use reqwest for HTTP client with async/await support
+- **SHR-006**: `universo-api-client` MUST provide type-safe API methods for all backend services
+- **SHR-007**: `universo-i18n` crate MUST support English and Russian languages with fluent-rs or rust-i18n
+- **SHR-008**: `universo-i18n` MUST provide macros for compile-time translation key validation
+- **SHR-009**: `universo-ui-components` crate MUST provide Yew components following Material Design principles
+- **SHR-010**: All shared packages MUST have comprehensive documentation and usage examples
+
+#### Dependency Management
+
+- **SHR-011**: Shared packages MUST be created in Phase 1 before any domain features
+- **SHR-012**: Domain packages MUST declare dependencies on shared packages in Cargo.toml
+- **SHR-013**: Shared packages MUST NOT depend on domain packages (strict unidirectional)
+- **SHR-014**: Version compatibility MUST be enforced through workspace dependencies
+- **SHR-015**: Breaking changes in shared packages MUST use semantic versioning
+
+### UPDL System Requirements
+
+#### UPDL Type Definitions
+
+- **UPDL-001**: UPDL node types MUST be defined in `universo-types` with serde traits
+- **UPDL-002**: High-level UPDL nodes MUST include: Scene, Entity, Transform, Material, Interaction, Animation, Export
+- **UPDL-003**: Legacy UPDL nodes for backward compatibility MUST include: Object, Camera, Light
+- **UPDL-004**: Each UPDL node MUST have unique identifier, type discriminator, and properties struct
+- **UPDL-005**: UPDL structures MUST be platform-agnostic and not tied to specific rendering engines
+
+#### UPDL Processing
+
+- **UPDL-006**: UPDL processor in `universo-utils` MUST convert flow graph JSON to typed UPDL structures
+- **UPDL-007**: UPDL processor MUST validate node connections and data flow
+- **UPDL-008**: UPDL processor MUST support both single-scene and multi-scene flows
+- **UPDL-009**: UPDL processor MUST handle node property resolution and inheritance
+- **UPDL-010**: UPDL validation errors MUST provide clear, actionable error messages
+
+#### UPDL Integration
+
+- **UPDL-011**: Visual editor MUST produce flow graphs that can be converted to UPDL
+- **UPDL-012**: UPDL structures MUST be stored in database for persistence
+- **UPDL-013**: Template packages MUST consume UPDL as input format
+- **UPDL-014**: UPDL specification MUST be documented with examples for each node type
+- **UPDL-015**: UPDL schema MUST support versioning for future extensions
+
+### Template System Requirements
+
+#### Template Package Interface
+
+- **TMPL-001**: All template packages MUST implement a standard trait-based interface
+- **TMPL-002**: Template trait MUST define methods: validate_updl, process, generate_artifacts
+- **TMPL-003**: Template packages MUST accept UPDL structures as input
+- **TMPL-004**: Template packages MUST generate deployable artifacts (HTML, JS, WASM)
+- **TMPL-005**: Template packages MUST return build status and artifact URLs or errors
+
+#### Template Implementations
+
+- **TMPL-006**: Initial implementation MUST include AR.js template for web-based augmented reality
+- **TMPL-007**: Initial implementation MUST include PlayCanvas template for 3D engine experiences
+- **TMPL-008**: Each template MUST handle platform-specific node type conversions
+- **TMPL-009**: Templates MUST validate UPDL compatibility before processing
+- **TMPL-010**: Templates MUST provide clear error messages for unsupported UPDL features
+
+#### Template Processing Pipeline
+
+- **TMPL-011**: Template processing MUST be triggered by export action in UI
+- **TMPL-012**: Backend MUST serve raw flow data; frontend processes UPDL and invokes templates
+- **TMPL-013**: Template processing MUST be asynchronous with progress reporting
+- **TMPL-014**: Generated artifacts MUST be stored with unique identifiers
+- **TMPL-015**: Templates MUST support incremental updates without full regeneration
 
 ### Clusters Feature Detailed Requirements
 
@@ -247,44 +338,86 @@ As a Rust developer setting up the project, I need configuration files for Cargo
 - GitHub labels and issue templates
 - Instruction files in .github/instructions/
 - Package structure template
+- **Shared Infrastructure Packages:**
+  - universo-types with base type definitions
+  - universo-utils with common utilities
+  - universo-api-client foundation
+  - universo-i18n with EN/RU support
+  - universo-ui-components base components
+- Build tooling configuration (WASM, cargo-watch, CI/CD)
 
 **Completion Criteria:**
-- All FR-001 through FR-020 satisfied
+- All FR-001 through FR-045 satisfied
+- All SHR-001 through SHR-015 satisfied
 - Documentation 100% bilingual
 - Cargo workspace compiles successfully
 - Quality gates configured
+- Shared infrastructure packages functional
+- WASM build pipeline documented and working
 
-**Estimated Effort:** 2-3 weeks
+**Estimated Effort:** 3-4 weeks
 
-#### Phase 2: Clusters Feature Implementation
+#### Phase 2: UPDL System and Clusters Feature
 
-**Dependencies:** Phase 1 complete
+**Dependencies:** Phase 1 complete, shared infrastructure operational
 
 **Deliverables:**
-- clusters-frt package (Yew frontend)
-- clusters-srv package (Actix backend)
-- clusters-common package (shared types)
-- Database schema and migrations
-- API endpoints for all CRUD operations
-- UI components for cluster management
+- **UPDL System:**
+  - UPDL type definitions in universo-types (UPDL-001 through UPDL-005)
+  - UPDL processor in universo-utils (UPDL-006 through UPDL-010)
+  - UPDL documentation and examples
+- **Clusters Feature:**
+  - clusters-frt package (Yew frontend)
+  - clusters-srv package (Actix backend)
+  - Database schema and migrations
+  - API endpoints for all CRUD operations
+  - UI components for cluster management
 - Complete test coverage
 - Documentation for three-entity pattern
 
 **Completion Criteria:**
 - All CLU-001 through CLU-014 satisfied
+- All UPDL-001 through UPDL-015 satisfied
+- UPDL processor converts flow graphs correctly
 - All tests passing
 - Demo deployment available
 - Pattern documentation complete for reuse
 
-**Estimated Effort:** 4-6 weeks
+**Estimated Effort:** 5-7 weeks
 
-#### Phase 3: Additional Features
+#### Phase 3: Template System and Additional Features
 
-**Dependencies:** Phase 2 complete, pattern established
+**Dependencies:** Phase 2 complete, UPDL system operational
 
-**Scope:** Replication of three-entity pattern to Metaverses, Uniks, and other features
+**Deliverables:**
+- **Template System:**
+  - Template trait interface in universo-utils
+  - AR.js template package (template-arjs)
+  - PlayCanvas template package (template-playcanvas)
+  - Template processing pipeline
+- **Additional Features:**
+  - Metaverses feature (following Clusters pattern)
+  - Uniks (workspaces) feature
+  - Spaces/Canvases feature
+- Publication system for sharing exported experiences
 
-**Approach:** Follow established Clusters pattern with entity-specific adaptations
+**Completion Criteria:**
+- All TMPL-001 through TMPL-015 satisfied
+- Templates generate working AR.js and PlayCanvas experiences
+- Additional features follow established patterns
+- End-to-end export workflow functional
+- Published experiences accessible via URLs
+
+**Estimated Effort:** 8-10 weeks
+
+#### Phase 4: Advanced Features (Future)
+
+**Scope:** 
+- Space Builder (AI-assisted flow generation)
+- Multiplayer infrastructure
+- Advanced authentication (OAuth2)
+- Analytics and monitoring
+- Additional template platforms
 
 ### Risk Management
 
@@ -325,6 +458,30 @@ As a Rust developer setting up the project, I need configuration files for Cargo
 - **Impact:** Medium
 - **Mitigation:** Pin dependency versions; monitor changelogs; test upgrades in branches
 - **Contingency:** Fork and maintain necessary dependencies if breaking changes are critical
+
+**RISK-007: UPDL System Complexity**
+- **Probability:** Medium
+- **Impact:** High
+- **Mitigation:** Start with minimal UPDL node set; comprehensive type system; thorough testing
+- **Contingency:** Simplify UPDL structure if complexity grows unmanageable; defer advanced features
+
+**RISK-008: Template System Interoperability**
+- **Probability:** Medium
+- **Impact:** High
+- **Mitigation:** Clear trait interface; extensive validation; platform-specific testing
+- **Contingency:** Focus on one template platform initially (AR.js); add others incrementally
+
+**RISK-009: Visual Editor Availability for Rust**
+- **Probability:** High
+- **Impact:** Critical
+- **Mitigation:** Research Rust flow editor libraries early; consider hybrid JS+WASM approach
+- **Contingency:** Use existing React Flow in hybrid mode; build custom editor in later phase
+
+**RISK-010: Shared Package Dependency Hell**
+- **Probability:** Medium
+- **Impact:** Medium
+- **Mitigation:** Strict versioning discipline; workspace dependencies; careful API design
+- **Contingency:** Revert to local duplication if shared packages cause more problems than they solve
 
 ### Technology Migration Specifications
 
@@ -412,6 +569,14 @@ As a Rust developer setting up the project, I need configuration files for Cargo
 - **API Contract**: Typed interface definition in shared packages specifying request/response structures
 - **Quality Gate**: Automated check (tests, linting, formatting) that must pass before code merge
 - **Phase**: Defined stage of implementation with specific deliverables and completion criteria
+- **Shared Infrastructure Package**: Foundation crate (universo-types, universo-utils, universo-api-client, universo-i18n, universo-ui-components) that provides common functionality to domain packages
+- **UPDL (Universal Platform Description Language)**: Platform-agnostic representation of 3D/AR/VR scenes that serves as the abstraction layer for multi-platform export
+- **UPDL Node**: A component in the visual programming interface that produces UPDL output (Scene, Entity, Transform, Material, Interaction, Animation, Export)
+- **UPDL Processor**: Utility in universo-utils that converts visual flow graphs to UPDL structures
+- **Template Package**: Specialized package that converts UPDL to platform-specific implementation (e.g., AR.js, PlayCanvas)
+- **Template Interface**: Trait-based contract that all template packages must implement for UPDL consumption and artifact generation
+- **Build Artifact**: Deployable output from template processing (HTML, JS, WASM binary) that can be hosted and executed
+
 
 ## Success Criteria *(mandatory)*
 
@@ -714,17 +879,37 @@ pub struct Cluster {
 
 **RBAC**: Role-Based Access Control - authorization model based on user roles
 
+**reqwest**: Rust HTTP client library for making API requests
+
 **REST API**: Representational State Transfer - architectural style for web services
+
+**serde**: Rust serialization/deserialization framework
+
+**Shared Infrastructure Package**: Foundation crate (universo-types, universo-utils, etc.) providing common functionality
 
 **Supabase**: Open-source Firebase alternative providing database and auth services
 
+**Template Package**: Specialized package converting UPDL to platform-specific implementation (AR.js, PlayCanvas)
+
 **Three-Entity Pattern**: Reusable architecture pattern with Parent/Child/Leaf entities
 
+**trunk**: Build and pipeline tool for Rust WASM applications
+
+**UPDL**: Universal Platform Description Language - platform-agnostic 3D/AR/VR scene representation
+
+**UPDL Node**: Visual programming component producing UPDL output (Scene, Entity, Transform, etc.)
+
+**UPDL Processor**: Utility converting flow graphs to UPDL structures
+
 **WASM**: WebAssembly - binary instruction format for web browsers
+
+**wasm-pack**: Tool for building and packaging Rust WASM projects
 
 **WCAG**: Web Content Accessibility Guidelines - accessibility standards
 
 **Yew**: Rust framework for building frontend web applications using WebAssembly
+
+**Yewdux**: State management library for Yew applications
 
 ## References
 
@@ -751,7 +936,15 @@ pub struct Cluster {
 
 ---
 
-**Specification Version**: 2.0.0  
-**Last Updated**: 2025-11-16  
-**Status**: Enhanced with comprehensive requirements  
+**Specification Version**: 3.0.0  
+**Last Updated**: 2025-11-17  
+**Status**: Enhanced with shared infrastructure, UPDL system, and template architecture from React analysis  
 **Next Review**: Before Phase 2 implementation begins
+**Changes in v3.0.0**:
+- Added shared infrastructure requirements (SHR-001 through SHR-015)
+- Added UPDL system requirements (UPDL-001 through UPDL-015)
+- Added template system requirements (TMPL-001 through TMPL-015)
+- Updated phased implementation with new structure
+- Added new risks (RISK-007 through RISK-010)
+- Expanded glossary with UPDL and template terms
+- Referenced ARCHITECTURAL-COMPARISON.md for detailed analysis

@@ -1,13 +1,19 @@
 <!--
-Sync Impact Report - Constitution v1.2.0
+Sync Impact Report - Constitution v1.3.0
 ========================================
-Version Change: 1.1.0 → 1.2.0 (Non-functional requirements and integration contracts)
-Date: 2025-11-16
+Version Change: 1.2.0 → 1.3.0 (Shared infrastructure and architectural patterns from React analysis)
+Date: 2025-11-17
+
+Principles Added in v1.3.0:
+- XII. Shared Infrastructure Priority (NEW)
+- XIII. Template System Architecture (NEW)
+- XIV. UPDL as Core Abstraction (NEW)
+- XV. Build Tooling Strategy (NEW)
 
 Principles Added in v1.2.0:
-- IX. Non-Functional Requirements Priority (NEW)
-- X. Integration Contracts (NEW)
-- XI. Risk Management (NEW)
+- IX. Non-Functional Requirements Priority
+- X. Integration Contracts
+- XI. Risk Management
 
 Principles Added in v1.1.0:
 - VIII. Repository Boundaries and Exclusions
@@ -36,7 +42,9 @@ Templates Status:
 ✅ tasks-template.md - Reviewed, no changes needed (generic structure)
 
 Follow-up TODOs:
-- None - all placeholders filled
+- Update specifications with shared infrastructure requirements
+- Add UPDL system to Phase 2 deliverables
+- Document template system architecture
 -->
 
 # Universo Platformo Rust Constitution
@@ -220,4 +228,82 @@ All specifications MUST identify and document risks with mitigation strategies:
 
 **Rationale**: Proactive risk management prevents project delays and failures. Documented risks enable informed decision-making and resource allocation.
 
-**Version**: 1.2.0 | **Ratified**: 2025-11-15 | **Last Amended**: 2025-11-16
+### XII. Shared Infrastructure Priority
+
+All projects MUST establish shared infrastructure packages before implementing domain features:
+- **universo-types**: Shared type definitions with serde traits for all entities, API contracts, and UPDL structures
+- **universo-utils**: Common utilities, processors (UPDL processor), and helper functions
+- **universo-api-client**: Centralized HTTP client for backend communication using reqwest
+- **universo-i18n**: Centralized internationalization using fluent-rs or rust-i18n
+- **universo-ui-components**: Shared Yew components following Material Design principles
+
+**Dependency Rule**: Domain packages (clusters, metaverses, etc.) MUST depend on shared packages, never the reverse.
+
+**Rationale**: Analysis of the React implementation revealed that creating shared packages early prevents massive code duplication (e.g., 7692 lines eliminated in chat components). Building shared infrastructure first ensures consistency across all domain packages and simplifies maintenance.
+
+### XIII. Template System Architecture
+
+The platform MUST support a template system for multi-platform export:
+- Templates are specialized packages that convert UPDL (Universal Platform Description Language) to platform-specific implementations
+- Each template package MUST implement a standard trait-based interface
+- Templates generate deployable artifacts (HTML, JS, WASM) from UPDL structures
+- Initial templates: AR.js (web-based AR) and PlayCanvas (3D engine)
+- UPDL processor MUST be in shared utilities, not duplicated per template
+
+**Template Interface Requirements**:
+- Accept UPDL flow data as input
+- Validate UPDL structure
+- Transform to target platform code
+- Generate deployable assets
+- Return build artifacts or deployment URLs
+
+**Rationale**: The React implementation's template system (`template-quiz`, `template-mmoomm`) enables the core value proposition of the platform: create once, deploy to multiple platforms. This is not an afterthought feature but a core architectural component.
+
+### XIV. UPDL as Core Abstraction
+
+UPDL (Universal Platform Description Language) MUST be treated as a first-class architectural component:
+- UPDL defines a platform-agnostic representation of 3D/AR/VR scenes
+- All visual programming nodes MUST produce UPDL output
+- UPDL structures MUST be defined in `universo-types` with serde serialization
+- UPDL processor in `universo-utils` converts flow graphs to UPDL
+- Templates consume UPDL and produce platform-specific code
+
+**UPDL Node Categories**:
+- High-level nodes: Scene, Entity, Transform, Material, Interaction, Animation, Export
+- Legacy nodes (for compatibility): Object, Camera, Light
+- All nodes MUST have clear type definitions, validation rules, and documentation
+
+**Integration Points**:
+- Visual editor produces flow graphs
+- Flow graphs are converted to UPDL
+- UPDL is stored in database
+- Templates read UPDL and generate code
+
+**Rationale**: UPDL is the abstraction layer that enables platform independence. Without a well-defined UPDL system, the platform devolves into a collection of platform-specific editors with no interoperability.
+
+### XV. Build Tooling Strategy
+
+Build tooling MUST be planned comprehensively from the start:
+- **WASM Frontend Builds**: Use `wasm-pack` or `trunk` for consistent WASM compilation
+- **Asset Handling**: Define explicit strategy for SVG icons, images, and static files
+- **Development Workflow**: Configure `cargo-watch` for hot-reload during development
+- **Multi-Target Builds**: Support both native (backend) and WASM (frontend) from same codebase
+- **Build Caching**: Leverage Cargo's incremental compilation and consider `sccache`
+- **CI/CD Pipeline**: GitHub Actions with Rust toolchain, clippy, rustfmt, tests, and security audit
+
+**Required Build Scripts**:
+- `cargo build --workspace` - Build all packages
+- `cargo test --workspace` - Run all tests
+- `cargo clippy --workspace -- -D warnings` - Lint with zero warnings allowed
+- `cargo fmt --all -- --check` - Verify formatting
+- Per-package WASM builds for frontend packages
+
+**Asset Handling**:
+- Store assets in `assets/` directory within each package
+- Use `include_bytes!()` or `include_str!()` for embedding
+- For WASM, assets must be accessible via HTTP or embedded in WASM binary
+- Document asset loading patterns for both native and WASM targets
+
+**Rationale**: The React implementation evolved through multiple build systems (tsc+gulp → tsdown), causing technical debt and migration effort. Rust has the advantage of choosing the right tools upfront. Additionally, WASM builds have specific requirements that must be addressed from day one to avoid costly refactoring.
+
+**Version**: 1.3.0 | **Ratified**: 2025-11-15 | **Last Amended**: 2025-11-17
