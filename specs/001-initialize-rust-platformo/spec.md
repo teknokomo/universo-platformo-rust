@@ -90,6 +90,11 @@ As a Rust developer setting up the project, I need configuration files for Cargo
 - **FR-001**: Repository MUST contain a comprehensive root README.md in English explaining Universo Platformo Rust, its relationship to the React version, and its technical stack (Rust, Yew, Actix Web)
 - **FR-002**: Repository MUST contain a README.ru.md that is an exact translation of README.md with identical structure and line count
 - **FR-003**: Repository MUST have a `packages/` directory for housing all feature packages
+- **FR-003a**: ALL application functionality MUST be implemented as packages within `packages/` directory (NON-NEGOTIABLE)
+- **FR-003b**: Repository root MUST NOT contain application source code, feature implementations, business logic, UI components, or API endpoints
+- **FR-003c**: Repository root MAY ONLY contain workspace configuration (Cargo.toml, rust-toolchain.toml), repository configuration (.gitignore, .github/), specification workflow (.specify/), and documentation files
+- **FR-003d**: Each package MUST be designed for potential extraction into a separate repository in the future
+- **FR-003e**: Implementing functionality outside `packages/` directory is STRICTLY PROHIBITED
 - **FR-004**: Package naming MUST follow the convention `[feature-name]-frt` for frontend and `[feature-name]-srv` for backend
 - **FR-005**: Each package MUST contain a `base/` subdirectory for the primary Rust implementation
 - **FR-006**: Repository MUST have a complete set of GitHub labels including type labels (feature, bug, enhancement, documentation, refactor, maintenance)
@@ -936,10 +941,15 @@ pub struct Cluster {
 
 ---
 
-**Specification Version**: 3.0.0  
+**Specification Version**: 3.1.0  
 **Last Updated**: 2025-11-17  
-**Status**: Enhanced with shared infrastructure, UPDL system, and template architecture from React analysis  
+**Status**: Enhanced with unconditional modular architecture requirements
 **Next Review**: Before Phase 2 implementation begins
+**Changes in v3.1.0**:
+- Added FR-003a through FR-003e: Explicit MANDATORY modular package structure
+- Clarified that ALL functionality MUST be in packages/
+- Prohibited functionality implementation outside packages/
+- Required future repository extraction capability
 **Changes in v3.0.0**:
 - Added shared infrastructure requirements (SHR-001 through SHR-015)
 - Added UPDL system requirements (UPDL-001 through UPDL-015)
