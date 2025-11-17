@@ -1,14 +1,18 @@
 <!--
-Sync Impact Report - Constitution v1.3.0
+Sync Impact Report - Constitution v1.4.0
 ========================================
-Version Change: 1.2.0 → 1.3.0 (Shared infrastructure and architectural patterns from React analysis)
+Version Change: 1.3.0 → 1.4.0 (Workspace dependency management and development tooling patterns)
 Date: 2025-11-17
 
+Principles Added in v1.4.0:
+- XVI. Workspace Dependency Catalog (NEW)
+- XVII. Development Workflow Standardization (NEW)
+
 Principles Added in v1.3.0:
-- XII. Shared Infrastructure Priority (NEW)
-- XIII. Template System Architecture (NEW)
-- XIV. UPDL as Core Abstraction (NEW)
-- XV. Build Tooling Strategy (NEW)
+- XII. Shared Infrastructure Priority
+- XIII. Template System Architecture
+- XIV. UPDL as Core Abstraction
+- XV. Build Tooling Strategy
 
 Principles Added in v1.2.0:
 - IX. Non-Functional Requirements Priority
@@ -306,4 +310,80 @@ Build tooling MUST be planned comprehensively from the start:
 
 **Rationale**: The React implementation evolved through multiple build systems (tsc+gulp → tsdown), causing technical debt and migration effort. Rust has the advantage of choosing the right tools upfront. Additionally, WASM builds have specific requirements that must be addressed from day one to avoid costly refactoring.
 
-**Version**: 1.3.0 | **Ratified**: 2025-11-15 | **Last Amended**: 2025-11-17
+### XVI. Workspace Dependency Catalog
+
+All shared dependencies MUST be defined in root `Cargo.toml` [workspace.dependencies] section:
+- **Version Consistency**: All packages reference the same version of each dependency
+- **Single Source of Truth**: Change version in one place, propagates to all packages
+- **Conflict Prevention**: Eliminates dependency version conflicts ("dependency hell")
+- **Simplified Upgrades**: Update dependency versions from central location
+
+**Package Dependencies Pattern**:
+```toml
+# Root Cargo.toml
+[workspace.dependencies]
+serde = { version = "1.0", features = ["derive"] }
+tokio = { version = "1.35", features = ["full"] }
+actix-web = "4.4"
+yew = "0.21"
+reqwest = { version = "0.11", features = ["json"] }
+sea-orm = { version = "0.12", features = ["sqlx-postgres"] }
+
+# Package Cargo.toml
+[dependencies]
+serde = { workspace = true }
+tokio = { workspace = true }
+actix-web = { workspace = true }
+```
+
+**Exceptions**:
+- Development dependencies MAY have package-specific versions if needed for testing
+- Feature flags MUST be consistent across workspace when dependency is shared
+
+**Rationale**: The React implementation uses PNPM's catalog feature to prevent version conflicts and ensure consistency. Cargo workspaces provide equivalent functionality through [workspace.dependencies], enabling centralized version management that prevents drift and simplifies maintenance.
+
+### XVII. Development Workflow Standardization
+
+Development tooling and workflows MUST be standardized across the project:
+
+**Required Development Tools**:
+- `cargo-watch` for auto-rebuild during development
+- `trunk` for WASM frontend development with hot reload
+- `cargo-husky` for git pre-commit hooks
+- `cargo-tarpaulin` for code coverage measurement
+
+**Quality Gates**:
+- Pre-commit hooks MUST run `cargo fmt --all -- --check`
+- Pre-commit hooks MUST run `cargo clippy --workspace -- -D warnings`
+- Pre-commit hooks SHOULD run `cargo test --workspace` (optional for speed)
+
+**Hot Reload Workflow**:
+- Backend development: `cargo watch -x 'run -p [package-name]'`
+- Frontend development: `trunk serve` in package directory
+- Shared packages: `cargo watch -x 'build -p universo-types -p universo-utils'`
+
+**Database Development**:
+- ORM: SeaORM as primary database abstraction layer
+- Migrations: Use SeaORM CLI for migration generation and application
+- Complex Queries: MAY use sqlx for type-safe SQL when needed
+- Entity Pattern: All database models MUST derive SeaORM Entity trait
+
+**Validation Strategy**:
+- Input validation MUST use `validator` crate
+- All API request types MUST implement Validate trait
+- Validation errors MUST return structured error responses
+
+**API Documentation**:
+- API endpoints MUST be documented with `utoipa` macros
+- OpenAPI specifications MUST be auto-generated from code
+- Swagger UI MUST be available during development
+
+**Testing Infrastructure**:
+- Unit tests: Standard `cargo test`
+- WASM tests: `wasm-bindgen-test` for frontend
+- Integration tests: `actix-web::test` for backend
+- Coverage: `cargo tarpaulin --workspace`
+
+**Rationale**: The React implementation uses various tools (Vite, Vitest, ESLint, Prettier, Husky) to ensure development velocity and code quality. Standardizing equivalent Rust tooling from day one prevents ad-hoc tool adoption and ensures consistent developer experience.
+
+**Version**: 1.4.0 | **Ratified**: 2025-11-15 | **Last Amended**: 2025-11-17
