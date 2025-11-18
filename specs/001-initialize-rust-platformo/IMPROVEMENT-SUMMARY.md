@@ -1,9 +1,13 @@
 # Specification Improvement Summary
 
-**Date**: 2025-11-16  
-**Task**: Deep analysis and comprehensive improvement of project specification based on checklists
-**Specification**: `specs/001-initialize-rust-platformo/spec.md`
-**Version Change**: 1.0.0 → 2.0.0
+**Date**: 2025-11-16 (Updated: 2025-11-17)  
+**Constitution Version**: 1.5.0 (Unconditional modular architecture - UPDATED 2025-11-17)  
+**Specification Version**: 3.1.0 (Mandatory package structure - UPDATED 2025-11-17)  
+**Task**: Deep analysis and comprehensive improvement of project specification based on checklists  
+**Specification**: `specs/001-initialize-rust-platformo/spec.md`  
+**Version History**: 1.0.0 → 2.0.0 → 3.0.0 → 3.1.0
+
+**⚠️ LATEST UPDATE (v3.1.0)**: Added FR-003a through FR-003e making modular package structure UNCONDITIONAL and NON-NEGOTIABLE. ALL functionality MUST be in `packages/` directory.
 
 ## What Was Done
 

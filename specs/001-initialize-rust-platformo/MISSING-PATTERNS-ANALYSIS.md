@@ -1,15 +1,21 @@
 # Missing Patterns Analysis: React to Rust Migration
 
 **Date**: 2025-11-17  
+**Constitution Version**: 1.5.0 (Unconditional modular architecture)  
+**Specification Version**: 3.1.0 (Mandatory package structure)  
 **Purpose**: Identify architectural patterns from React repository not fully documented in current Rust plans  
 **React Repository**: https://github.com/teknokomo/universo-platformo-react  
 **Related Documents**: ARCHITECTURAL-COMPARISON.md, IMPLEMENTATION-ROADMAP.md
+
+**⚠️ CRITICAL**: ALL patterns MUST be implemented within `packages/` directory structure. Non-modular implementations are PROHIBITED.
 
 ---
 
 ## Executive Summary
 
 This document complements the existing architectural comparison by identifying 15 additional patterns and best practices from the React implementation that should be incorporated into the Rust project plans. These patterns cover dependency management, code organization, testing, quality assurance, and development workflows.
+
+**Foundation Pattern**: The React repository demonstrates successful modular architecture with ALL functionality in packages/. This pattern is now MANDATORY and NON-NEGOTIABLE in the Rust implementation (Constitution v1.5.0, Spec v3.1.0).
 
 ## Critical Patterns Requiring Immediate Documentation
 

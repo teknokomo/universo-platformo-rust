@@ -2,11 +2,13 @@
 
 ## Overview
 
-This document provides a practical roadmap for implementing Universo Platformo Rust based on the architectural analysis of the React version and updated specifications (v3.0.0).
+This document provides a practical roadmap for implementing Universo Platformo Rust based on the architectural analysis of the React version and updated specifications (v3.1.0).
+
+**CRITICAL**: ALL functionality MUST be implemented as packages in `packages/` directory. This is NON-NEGOTIABLE.
 
 **Last Updated**: 2025-11-17  
-**Constitution Version**: 1.3.0  
-**Specification Version**: 3.0.0
+**Constitution Version**: 1.5.0 (Strengthened modular requirements)
+**Specification Version**: 3.1.0 (Added mandatory package structure)
 
 ## Quick Reference
 

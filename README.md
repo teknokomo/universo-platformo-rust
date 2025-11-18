@@ -101,12 +101,53 @@ This repository implements the same conceptual foundation as [Universo Platformo
 
 ## Project Structure
 
+**CRITICAL: Modular Architecture (NON-NEGOTIABLE)**
+
+ALL application functionality MUST be implemented as packages in the `packages/` directory. This is a fundamental architectural requirement that cannot be violated.
+
+**What MUST be in packages/**:
+- ✅ All feature implementations (frontend and backend)
+- ✅ All business logic and application code
+- ✅ All UI components
+- ✅ All API endpoints
+- ✅ Shared infrastructure (types, utils, i18n, UI components)
+
+**What is allowed in repository root**:
+- ✅ Cargo.toml (workspace configuration)
+- ✅ rust-toolchain.toml (toolchain specification)
+- ✅ .gitignore, .github/ (repository configuration)
+- ✅ .specify/ (specification workflow)
+- ✅ README files and LICENSE
+
+**What is PROHIBITED in repository root**:
+- ❌ Application source code (NO src/ directory)
+- ❌ Feature implementations
+- ❌ Business logic
+- ❌ UI components
+- ❌ API endpoints
+
+This modular structure ensures that:
+1. Packages can be extracted to separate repositories in the future
+2. Teams can work independently on different packages
+3. Deployment can be done per-package
+4. Code boundaries are clear and enforceable
+
 ```
 universo-platformo-rust/
-├── packages/                  # All feature packages
-│   ├── clusters-frt/          # Clusters frontend
+├── packages/                  # ALL APPLICATION CODE MUST BE HERE
+│   ├── universo-types/        # Shared type definitions (PRIORITY: Create first)
+│   │   └── base/
+│   ├── universo-utils/        # Common utilities (PRIORITY: Create first)
+│   │   └── base/
+│   ├── universo-api-client/   # HTTP client (PRIORITY: Create first)
+│   │   └── base/
+│   ├── universo-i18n/         # Internationalization (PRIORITY: Create first)
+│   │   └── base/
+│   ├── universo-ui-components/# Shared UI components (PRIORITY: Create first)
+│   │   └── base/
+│   ├── clusters-frt/          # Clusters frontend (Phase 2)
 │   │   └── base/              # Primary Rust/Yew implementation
-│   ├── clusters-srv/          # Clusters backend
+│   ├── clusters-srv/          # Clusters backend (Phase 2)
 │   │   └── base/              # Primary Rust/Actix implementation
 │   ├── [feature]-frt/         # Other frontend packages
 │   └── [feature]-srv/         # Other backend packages
@@ -122,15 +163,16 @@ universo-platformo-rust/
 │       ├── github-labels.md   # Label conventions
 │       ├── github-pr.md       # Pull request guidelines
 │       └── i18n-docs.md       # Bilingual documentation rules
-├── Cargo.toml                 # Workspace configuration
+├── Cargo.toml                 # Workspace configuration (NO application code)
 └── README.md                  # This file
 ```
 
 This structure allows for:
 
--   **Modularity**: Each feature is contained within its own package(s)
--   **Clear Separation**: Frontend and backend packages are distinct
--   **Scalability**: New features can be added as new packages
+-   **Mandatory Modularity**: Each feature MUST be contained within its own package(s)
+-   **Clear Separation**: Frontend and backend packages are distinct (-frt/-srv suffixes)
+-   **Scalability**: New features MUST be added as new packages in packages/
+-   **Future Repository Extraction**: Packages are designed to become separate repositories
 -   **Future-Proofing**: `base/` subdirectories allow for alternative implementations
 
 ## Key Features

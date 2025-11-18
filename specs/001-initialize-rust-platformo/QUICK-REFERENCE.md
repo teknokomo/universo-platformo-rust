@@ -2,7 +2,11 @@
 
 **Purpose**: Fast lookup guide for developers implementing patterns from React repository  
 **Last Updated**: 2025-11-17  
+**Constitution Version**: 1.5.0 (Unconditional modular architecture)  
+**Specification Version**: 3.1.0 (Mandatory package structure)  
 **Related**: MISSING-PATTERNS-ANALYSIS.md, ARCHITECTURAL-COMPARISON.md
+
+**⚠️ CRITICAL**: ALL functionality MUST be implemented as packages in `packages/` directory. This is NON-NEGOTIABLE.
 
 ---
 

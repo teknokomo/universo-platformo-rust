@@ -5,9 +5,11 @@
 
 **Note**: This template is filled in by the `/speckit.plan` command. See `.specify/templates/commands/plan.md` for the execution workflow.
 
+**IMPORTANT UPDATE (2025-11-17)**: Constitution v1.5.0 and Spec v3.1.0 now UNCONDITIONALLY require ALL functionality in packages/ directory. Repository root restricted to configuration only.
+
 ## Summary
 
-Initialize the Universo Platformo Rust project with proper monorepo structure using Cargo workspaces, bilingual documentation (EN/RU), shared infrastructure packages (universo-types, universo-utils, universo-api-client, universo-i18n, universo-ui-components), and comprehensive development workflow guidelines. This foundation enables the Rust/Yew/Actix Web implementation of the platform as an alternative to the React version.
+Initialize the Universo Platformo Rust project with MANDATORY modular monorepo structure using Cargo workspaces, bilingual documentation (EN/RU), shared infrastructure packages (universo-types, universo-utils, universo-api-client, universo-i18n, universo-ui-components), and comprehensive development workflow guidelines. ALL application functionality MUST be implemented as packages in packages/ directory. This foundation enables the Rust/Yew/Actix Web implementation of the platform as an alternative to the React version, with explicit preparation for future package extraction to separate repositories.
 
 ## Technical Context
 
@@ -30,10 +32,18 @@ Initialize the Universo Platformo Rust project with proper monorepo structure us
 - **Action**: Root Cargo.toml will define workspace with all packages in packages/ directory
 - **Validation**: `cargo build --workspace` must compile successfully
 
-### ✅ Principle II: Package Structure Convention
+### ✅ Principle II: Package Structure Convention (NON-NEGOTIABLE)
 - **Status**: COMPLIANT
-- **Action**: All packages in packages/ with -frt/-srv suffixes and base/ subdirectories
-- **Validation**: Directory structure follows packages/[name]-{frt,srv}/base/ pattern
+- **Action**: ALL application functionality in packages/ directory ONLY. Repository root restricted to configuration files.
+- **Critical Requirements**:
+  - ✅ All packages in packages/ with -frt/-srv suffixes and base/ subdirectories
+  - ✅ NO application code in repository root (NO src/ directory)
+  - ✅ NO feature implementations outside packages/
+  - ✅ Packages designed for future extraction to separate repositories
+- **Validation**: 
+  - Directory structure follows packages/[name]-{frt,srv}/base/ pattern
+  - Repository root contains ONLY: Cargo.toml, rust-toolchain.toml, .gitignore, .github/, .specify/, README files
+  - Zero application code files in repository root
 
 ### ✅ Principle III: Bilingual Documentation (NON-NEGOTIABLE)
 - **Status**: COMPLIANT

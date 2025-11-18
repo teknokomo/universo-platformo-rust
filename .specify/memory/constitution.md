@@ -1,8 +1,11 @@
 <!--
-Sync Impact Report - Constitution v1.4.0
+Sync Impact Report - Constitution v1.5.0
 ========================================
-Version Change: 1.3.0 → 1.4.0 (Workspace dependency management and development tooling patterns)
+Version Change: 1.4.0 → 1.5.0 (Strengthened modular architecture requirements)
 Date: 2025-11-17
+
+Principles Updated in v1.5.0:
+- II. Package Structure Convention - MAJOR UPDATE: Added NON-NEGOTIABLE status, explicit prohibition of functionality outside packages/, future extraction requirements, and repository root restrictions
 
 Principles Added in v1.4.0:
 - XVI. Workspace Dependency Catalog (NEW)
@@ -61,15 +64,52 @@ The project MUST be organized as a monorepo using Cargo workspace management. Al
 
 **Rationale**: Monorepo structure facilitates code sharing, simplifies dependency management, and enables atomic cross-package changes. Cargo workspaces provide native Rust tooling support for this pattern.
 
-### II. Package Structure Convention
+### II. Package Structure Convention (NON-NEGOTIABLE)
 
-All packages MUST be organized in the `packages/` directory following these rules:
+**CRITICAL**: ALL application functionality MUST be implemented as packages in the `packages/` directory. This is MANDATORY and NON-NEGOTIABLE.
+
+**Structural Requirements**:
+- ALL application code MUST reside in packages within `packages/` directory
 - Packages requiring both frontend and backend MUST be split into separate packages with `-frt` (frontend) and `-srv` (server/backend) suffixes
 - Example: `packages/clusters-frt` and `packages/clusters-srv`
 - Each package MUST contain a root `base/` directory to accommodate future alternative implementations
 - Package naming MUST be lowercase with hyphens as separators
 
-**Rationale**: Clear separation of frontend and backend code enables independent deployment and testing. The `base/` directory pattern prepares the codebase for future technology stack alternatives while maintaining a consistent interface.
+**Repository Root Restrictions**:
+- The repository root MAY ONLY contain:
+  - `Cargo.toml` (workspace configuration)
+  - `rust-toolchain.toml` (toolchain specification)
+  - `.gitignore`, `.github/` (repository configuration)
+  - `.specify/` (specification workflow)
+  - `README.md`, `README-RU.md`, `LICENSE` (documentation)
+  - Root-level build/launch scripts (if absolutely necessary)
+- The repository root MUST NOT contain:
+  - Application source code (`src/` directories)
+  - Feature implementations
+  - Business logic
+  - UI components
+  - API endpoints
+
+**Prohibited Patterns**:
+- ❌ Implementing functionality directly in repository root
+- ❌ Creating `src/` directory in repository root for application code
+- ❌ Placing feature code outside `packages/` directory
+- ❌ Monolithic applications without package separation
+
+**Future-Proofing Requirement**:
+- Packages MUST be designed for eventual extraction into separate repositories
+- Package boundaries MUST enable independent versioning and deployment
+- Inter-package dependencies MUST be explicit and manageable
+- Each package MUST be self-contained with clear interfaces
+
+**Rationale**: Modular package architecture is essential for:
+1. **Scalability**: As the project grows, packages can be extracted to separate repositories
+2. **Independent Development**: Teams can work on different packages simultaneously
+3. **Clear Boundaries**: Package separation enforces architectural discipline
+4. **Reusability**: Packages can be shared across different projects
+5. **Deployment Flexibility**: Packages can be deployed independently
+
+This structure mirrors the proven architecture of [Universo Platformo React](https://github.com/teknokomo/universo-platformo-react) and is fundamental to the platform's long-term maintainability and evolution.
 
 ### III. Bilingual Documentation (NON-NEGOTIABLE)
 
@@ -386,4 +426,4 @@ Development tooling and workflows MUST be standardized across the project:
 
 **Rationale**: The React implementation uses various tools (Vite, Vitest, ESLint, Prettier, Husky) to ensure development velocity and code quality. Standardizing equivalent Rust tooling from day one prevents ad-hoc tool adoption and ensures consistent developer experience.
 
-**Version**: 1.4.0 | **Ratified**: 2025-11-15 | **Last Amended**: 2025-11-17
+**Version**: 1.5.0 | **Ratified**: 2025-11-15 | **Last Amended**: 2025-11-17
