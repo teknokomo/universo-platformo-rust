@@ -4,14 +4,16 @@
 
 This document captures the comprehensive analysis of the Universo Platformo React repository to identify architectural patterns, concepts, and best practices that should be incorporated into the Rust implementation.
 
-**Analysis Date**: 2025-11-16 (Updated: 2025-11-17)  
-**Constitution Version**: 1.5.0 (Unconditional modular architecture - UPDATED 2025-11-17)  
+**Analysis Date**: 2025-11-16 (Updated: 2025-11-18)  
+**Constitution Version**: 1.6.0 (Rust ecosystem best practices integration - UPDATED 2025-11-18)  
 **Specification Version**: 3.1.0 (Mandatory package structure - UPDATED 2025-11-17)  
 **React Repository**: https://github.com/teknokomo/universo-platformo-react  
 **React Version Analyzed**: 0.38.0-alpha  
 **Source Commit**: 5e315c5455bec753ed45494a79c9c3d38630450a
 
-**⚠️ CRITICAL UPDATE**: Constitution and Specification updated to make modular package architecture UNCONDITIONAL. ALL functionality in Rust implementation MUST be in `packages/` directory, mirroring the React repository's proven pattern.
+**⚠️ CRITICAL UPDATE (2025-11-18)**: Constitution v1.6.0 now includes comprehensive Rust ecosystem best practices for Yew/Actix Web, inter-package communication patterns, build tooling recommendations, and technology-specific implementation guidance.
+
+**⚠️ CRITICAL UPDATE (2025-11-17)**: Constitution and Specification updated to make modular package architecture UNCONDITIONAL. ALL functionality in Rust implementation MUST be in `packages/` directory, mirroring the React repository's proven pattern.
 
 ## Executive Summary
 
@@ -1297,6 +1299,524 @@ The React implementation has evolved significantly and includes sophisticated pa
 7. **Start Clean, Stay Clean**: Avoiding legacy code from the start is far easier than cleaning it up later.
 
 The Rust implementation has the opportunity to incorporate these lessons from day one, creating a more maintainable and scalable architecture than the React version achieved through evolutionary development.
+
+## Rust Technology Stack Best Practices Integration
+
+**Date Added**: 2025-11-18  
+**Constitution Version**: 1.6.0  
+**Based on**: Web research, Context7 documentation (Yew, Actix Web), and 2025 Rust fullstack patterns
+
+This section documents how to translate React patterns to idiomatic Rust implementations while maintaining architectural consistency.
+
+### Frontend: Yew Best Practices
+
+#### Component Architecture
+
+**React Pattern**: Function components with hooks (useState, useEffect, useReducer)  
+**Rust Equivalent**:
+```rust
+use yew::prelude::*;
+
+#[function_component(MyComponent)]
+fn my_component() -> Html {
+    let counter = use_state(|| 0);
+    
+    let onclick = {
+        let counter = counter.clone();
+        Callback::from(move |_| counter.set(*counter + 1))
+    };
+    
+    html! {
+        <button {onclick}>{ "Increment" }</button>
+    }
+}
+```
+
+**Key Patterns**:
+- Use function components with hooks over struct components
+- `use_state` for local state, `use_reducer` for complex state
+- `use_effect` for side effects
+- `Callback` for event handlers
+- Clone state handles before moving into closures
+
+#### Component Props and Type Safety
+
+**React Pattern**: TypeScript interfaces for props  
+**Rust Equivalent**:
+```rust
+use yew::prelude::*;
+
+#[derive(Properties, PartialEq)]
+pub struct VideoProps {
+    pub video: Video,
+    pub on_select: Callback<Video>,
+}
+
+#[function_component(VideoItem)]
+fn video_item(props: &VideoProps) -> Html {
+    let onclick = {
+        let video = props.video.clone();
+        let on_select = props.on_select.clone();
+        Callback::from(move |_| on_select.emit(video.clone()))
+    };
+    
+    html! {
+        <div {onclick}>{ &props.video.title }</div>
+    }
+}
+```
+
+**Key Patterns**:
+- Props must derive `Properties` trait
+- Use `PartialEq` for efficient re-render checks
+- Clone callbacks and data before moving into event handlers
+
+#### State Management
+
+**React Pattern**: Redux or Context API  
+**Rust Equivalent**: Yewdux for global state
+
+```rust
+use yewdux::prelude::*;
+
+#[derive(Default, Clone, PartialEq, Store)]
+struct AppState {
+    selected_video: Option<Video>,
+    user: Option<User>,
+}
+
+#[function_component(App)]
+fn app() -> Html {
+    let (state, dispatch) = use_store::<AppState>();
+    
+    let on_select = dispatch.reduce_mut_callback(|state| {
+        state.selected_video = Some(video);
+    });
+    
+    html! { /* ... */ }
+}
+```
+
+**Key Patterns**:
+- Use Yewdux for complex global state
+- `use_reducer` for component-local complex state
+- Keep state immutable where possible
+
+### Backend: Actix Web Best Practices
+
+#### Application Structure
+
+**React Pattern**: Express with route separation  
+**Rust Equivalent**: Actix Web with scoped services
+
+```rust
+use actix_web::{web, App, HttpServer};
+
+#[actix_web::main]
+async fn main() -> std::io::Result<()> {
+    HttpServer::new(|| {
+        App::new()
+            .wrap(middleware::Logger::default())
+            .wrap(Cors::default())
+            .service(
+                web::scope("/api/v1")
+                    .service(clusters::routes())
+                    .service(auth::routes())
+            )
+    })
+    .bind(("127.0.0.1", 8080))?
+    .run()
+    .await
+}
+```
+
+**Key Patterns**:
+- Use `.wrap()` for middleware registration
+- Scope routes by feature (`/api/v1/clusters`, `/api/v1/auth`)
+- Organize by domain (clusters, auth, etc.)
+
+#### Request Handlers and Type Safety
+
+**React Pattern**: Express handlers with manual validation  
+**Rust Equivalent**: Typed extractors with automatic validation
+
+```rust
+use actix_web::{web, HttpResponse, Result};
+use serde::{Deserialize, Serialize};
+
+#[derive(Debug, Deserialize, Validate)]
+pub struct CreateClusterRequest {
+    #[validate(length(min = 1, max = 255))]
+    pub name: String,
+    pub description: Option<String>,
+}
+
+#[derive(Debug, Serialize)]
+pub struct ClusterResponse {
+    pub id: Uuid,
+    pub name: String,
+    pub created_at: DateTime<Utc>,
+}
+
+async fn create_cluster(
+    req: web::Json<CreateClusterRequest>,
+    db: web::Data<DbPool>,
+) -> Result<HttpResponse> {
+    req.validate()?;
+    
+    let cluster = db.create_cluster(req.into_inner()).await?;
+    
+    Ok(HttpResponse::Created().json(ClusterResponse::from(cluster)))
+}
+```
+
+**Key Patterns**:
+- Use typed extractors: `Json<T>`, `Path<T>`, `Query<T>`
+- Automatic deserialization with compile-time safety
+- Validation with `validator` crate
+- Shared state via `web::Data<T>`
+
+#### Middleware and Authentication
+
+**React Pattern**: Passport.js middleware  
+**Rust Equivalent**: actix-web-httpauth or custom middleware
+
+```rust
+use actix_web::{dev::Service, HttpMessage};
+use actix_web_httpauth::extractors::bearer::BearerAuth;
+
+async fn auth_validator(
+    req: ServiceRequest,
+    credentials: BearerAuth,
+) -> Result<ServiceRequest, Error> {
+    let token = credentials.token();
+    let user = verify_supabase_token(token).await?;
+    req.extensions_mut().insert(user);
+    Ok(req)
+}
+
+// In app configuration:
+.wrap(HttpAuthentication::bearer(auth_validator))
+```
+
+**Key Patterns**:
+- Use `HttpAuthentication` for JWT validation
+- Store authenticated user in request extensions
+- Custom middleware via `Transform` trait for complex logic
+
+### Inter-Package Communication
+
+#### Shared Types with Serde
+
+**React Pattern**: TypeScript types in @universo/types  
+**Rust Equivalent**: Rust structs in universo-types crate
+
+```rust
+// In universo-types/src/api/clusters.rs
+use serde::{Deserialize, Serialize};
+use uuid::Uuid;
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct Cluster {
+    pub id: Uuid,
+    pub name: String,
+    pub description: Option<String>,
+}
+
+// Used in backend:
+async fn get_cluster(id: Uuid) -> Result<Cluster>
+
+// Used in frontend via API client:
+let cluster: Cluster = api_client.get_cluster(id).await?;
+```
+
+**Key Patterns**:
+- ALL shared types in `universo-types` crate
+- Derive `Serialize` and `Deserialize` for API types
+- Derive `Clone` for types used in Yew (WASM doesn't support all traits)
+- Use `#[serde(rename_all = "camelCase")]` for JSON compatibility
+
+#### API Client Pattern
+
+**React Pattern**: Axios clients in @universo/api-client  
+**Rust Equivalent**: reqwest client in universo-api-client
+
+```rust
+// In universo-api-client/src/clusters.rs
+use reqwest::Client;
+use universo_types::api::*;
+
+pub struct ClustersClient {
+    client: Client,
+    base_url: String,
+}
+
+impl ClustersClient {
+    pub async fn list(&self) -> Result<Vec<ClusterResponse>> {
+        let response = self.client
+            .get(format!("{}/api/v1/clusters", self.base_url))
+            .send()
+            .await?
+            .json::<Vec<ClusterResponse>>()
+            .await?;
+        Ok(response)
+    }
+    
+    pub async fn create(&self, req: CreateClusterRequest) -> Result<ClusterResponse> {
+        let response = self.client
+            .post(format!("{}/api/v1/clusters", self.base_url))
+            .json(&req)
+            .send()
+            .await?
+            .json::<ClusterResponse>()
+            .await?;
+        Ok(response)
+    }
+}
+```
+
+**Key Patterns**:
+- Centralized HTTP client in shared crate
+- Use shared types from `universo-types`
+- Async/await throughout
+- Consider code generation from OpenAPI specs (utoipa)
+
+### Database Access
+
+#### Repository Pattern with Traits
+
+**React Pattern**: TypeORM repositories  
+**Rust Equivalent**: Trait-based repositories with SQLx
+
+```rust
+// In universo-types/src/repositories/clusters.rs
+use async_trait::async_trait;
+
+#[async_trait]
+pub trait ClusterRepository: Send + Sync {
+    async fn create(&self, req: CreateCluster) -> Result<Cluster>;
+    async fn find_by_id(&self, id: Uuid) -> Result<Option<Cluster>>;
+    async fn list(&self, pagination: Pagination) -> Result<Vec<Cluster>>;
+    async fn update(&self, id: Uuid, req: UpdateCluster) -> Result<Cluster>;
+    async fn delete(&self, id: Uuid) -> Result<()>;
+}
+
+// In clusters-srv/src/repositories/pg_cluster_repository.rs
+pub struct PgClusterRepository {
+    pool: PgPool,
+}
+
+#[async_trait]
+impl ClusterRepository for PgClusterRepository {
+    async fn create(&self, req: CreateCluster) -> Result<Cluster> {
+        let cluster = sqlx::query_as!(
+            Cluster,
+            "INSERT INTO clusters (name, description) VALUES ($1, $2) RETURNING *",
+            req.name,
+            req.description
+        )
+        .fetch_one(&self.pool)
+        .await?;
+        
+        Ok(cluster)
+    }
+    
+    // ... other methods
+}
+```
+
+**Key Patterns**:
+- Define repository traits in shared package
+- Implement traits for specific databases
+- Use SQLx for compile-time query checking
+- `async_trait` macro for async trait methods
+
+### Build and Development Tooling
+
+#### Frontend Build
+
+**React Pattern**: Vite for dev server, build pipeline  
+**Rust Equivalent**: Trunk for Yew applications
+
+```toml
+# Trunk.toml
+[build]
+target = "index.html"
+dist = "dist"
+
+[watch]
+ignore = ["dist"]
+
+[serve]
+address = "127.0.0.1"
+port = 8000
+```
+
+**Commands**:
+```bash
+# Development with hot reload
+trunk serve
+
+# Production build
+trunk build --release
+
+# With wasm-opt optimization
+trunk build --release --features "wasm-opt"
+```
+
+#### Backend Development
+
+**React Pattern**: nodemon for auto-restart  
+**Rust Equivalent**: cargo-watch
+
+```bash
+# Watch and restart on changes
+cargo watch -x 'run -p clusters-srv'
+
+# Watch and run tests
+cargo watch -x 'test -p universo-types'
+```
+
+#### Workspace Commands
+
+**React Pattern**: PNPM workspace commands  
+**Rust Equivalent**: Cargo workspace commands
+
+```bash
+# Build all packages
+cargo build --workspace
+
+# Test all packages
+cargo test --workspace
+
+# Lint all packages
+cargo clippy --workspace -- -D warnings
+
+# Format all packages
+cargo fmt --all
+
+# Build specific package
+cargo build -p clusters-srv
+
+# Run specific backend
+cargo run -p clusters-srv
+```
+
+### Dependency Management
+
+#### Workspace Dependencies
+
+**React Pattern**: PNPM catalog in pnpm-workspace.yaml  
+**Rust Equivalent**: [workspace.dependencies] in root Cargo.toml
+
+```toml
+# Root Cargo.toml
+[workspace]
+members = [
+    "packages/universo-types/base",
+    "packages/universo-utils/base",
+    "packages/clusters-frt/base",
+    "packages/clusters-srv/base",
+]
+
+[workspace.dependencies]
+serde = { version = "1.0", features = ["derive"] }
+tokio = { version = "1.35", features = ["full"] }
+actix-web = "4.4"
+yew = { version = "0.21", features = ["csr"] }
+sqlx = { version = "0.7", features = ["postgres", "runtime-tokio-rustls", "macros"] }
+
+# Package Cargo.toml
+[dependencies]
+serde = { workspace = true }
+tokio = { workspace = true }
+```
+
+**Key Patterns**:
+- Define versions once in workspace
+- Packages reference with `{ workspace = true }`
+- Feature flags can be package-specific
+- Dev dependencies can be local if needed
+
+### Testing Strategy
+
+#### Frontend Testing
+
+**React Pattern**: Vitest for component testing  
+**Rust Equivalent**: wasm-bindgen-test
+
+```rust
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use wasm_bindgen_test::*;
+
+    wasm_bindgen_test_configure!(run_in_browser);
+
+    #[wasm_bindgen_test]
+    fn test_component_renders() {
+        let props = VideoProps {
+            video: Video::mock(),
+            on_select: Callback::noop(),
+        };
+        
+        let rendered = yew::ServerRenderer::<VideoItem>::with_props(|| props)
+            .render()
+            .await;
+        
+        assert!(rendered.contains("Mock Video"));
+    }
+}
+```
+
+#### Backend Testing
+
+**React Pattern**: Jest for API testing  
+**Rust Equivalent**: actix-web::test
+
+```rust
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use actix_web::{test, App};
+
+    #[actix_web::test]
+    async fn test_create_cluster() {
+        let app = test::init_service(
+            App::new()
+                .service(web::resource("/clusters").route(web::post().to(create_cluster)))
+        ).await;
+
+        let req = test::TestRequest::post()
+            .uri("/clusters")
+            .set_json(&CreateClusterRequest {
+                name: "Test Cluster".to_string(),
+                description: None,
+            })
+            .to_request();
+
+        let resp: ClusterResponse = test::call_and_read_body_json(&app, req).await;
+        
+        assert_eq!(resp.name, "Test Cluster");
+    }
+}
+```
+
+### Key Takeaways for Rust Implementation
+
+1. **Type Safety Everywhere**: Rust's type system provides compile-time guarantees that eliminate entire classes of runtime errors that TypeScript can only warn about.
+
+2. **Shared Types Are Critical**: The `universo-types` crate with serde traits enables type-safe communication between frontend and backend with zero runtime overhead.
+
+3. **Cargo Workspace = PNPM Workspace**: Both provide centralized dependency management and efficient builds, but Cargo's integration is even tighter.
+
+4. **Async Throughout**: Both Yew and Actix Web are built on async/await, requiring careful handling of futures and async boundaries.
+
+5. **Build Tools Matter**: Trunk for frontend, cargo-watch for backend, and proper CI/CD configuration are essential for developer productivity.
+
+6. **Learn from React's Evolution**: The React implementation learned through trial and error that shared infrastructure packages are essential. Start with them in Rust from day one.
+
+7. **Rust's Strengths**: Leverage Rust's ownership system, trait system, and compile-time guarantees for better architecture than TypeScript allows.
 
 ---
 
