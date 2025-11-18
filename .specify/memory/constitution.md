@@ -1,6 +1,12 @@
 <!--
-Sync Impact Report - Constitution v1.5.0
+Sync Impact Report - Constitution v1.6.0
 ========================================
+Version Change: 1.5.0 → 1.6.0 (Rust ecosystem best practices integration)
+Date: 2025-11-18
+
+Principles Updated in v1.6.0:
+- VII. Best Practices for Rust Fullstack - MAJOR UPDATE: Comprehensive Rust ecosystem patterns for Yew/Actix Web, inter-package communication via shared types with serde, build tooling recommendations, and integration of lessons learned from React implementation
+
 Version Change: 1.4.0 → 1.5.0 (Strengthened modular architecture requirements)
 Date: 2025-11-17
 
@@ -154,17 +160,60 @@ Features MUST be specified before implementation:
 
 ### VII. Best Practices for Rust Fullstack
 
-Implementation MUST follow Rust ecosystem best practices:
-- Use idiomatic Rust patterns and conventions
-- Leverage Yew for frontend (WebAssembly)
-- Leverage Actix Web for backend
-- Authentication using Rust-native solutions (compatible with Passport.js patterns from original)
-- UI components following Material Design principles
-- Do NOT blindly port bad patterns from the React implementation - analyze and improve
-- Consult the reference implementation at https://github.com/teknokomo/universo-platformo-react for concept ONLY
-- Note: The React implementation is partially complete and contains legacy Flowise code; avoid porting these incomplete or legacy sections
+Implementation MUST follow Rust ecosystem best practices based on proven patterns from the React implementation and 2025 Rust fullstack architecture:
 
-**Rationale**: Each technology stack has its own best practices. While the React implementation provides the conceptual foundation, this Rust implementation must use patterns appropriate to the Rust ecosystem for maintainability and performance.
+**Frontend (Yew) Best Practices**:
+- Use function components with hooks (`use_state`, `use_reducer`, `use_effect`) for state management
+- Component props MUST derive `Properties` trait for type safety
+- Use `html!` macro for type-safe templating
+- Shared UI components MUST be in `universo-ui-components` package
+- State management: Use Yewdux or `use_reducer` for complex global state
+- Async operations via `spawn_local` with `wasm-bindgen-futures`
+- Build tooling: Trunk for development with hot reload, wasm-pack for library crates
+
+**Backend (Actix Web) Best Practices**:
+- Use async handlers (`async fn`) for all endpoints
+- Typed extractors for request data: `Json<T>`, `Path<T>`, `Query<T>`
+- Middleware registration via `.wrap()` method (CORS, logging, authentication)
+- Error handling: Implement `ResponseError` trait for custom errors
+- Shared application state via `actix-web::web::Data`
+- Database access through trait-based repository pattern with `async_trait`
+- Integration tests using `actix-web::test` utilities
+
+**Inter-Package Communication**:
+- Shared type definitions in `universo-types` package with serde traits
+- All API request/response types MUST derive `Serialize` and `Deserialize`
+- Frontend-backend contracts defined as Rust structs (compile-time safety)
+- HTTP client in `universo-api-client` package using `reqwest`
+- Type sharing eliminates runtime type errors between frontend and backend
+
+**Database and Authentication**:
+- Repository pattern: Define traits in shared package, implement in backend
+- Use SQLx for type-safe database queries with compile-time verification
+- Supabase integration via PostgreSQL connection string
+- Authentication: `actix-web-httpauth` for JWT or session-based auth
+- Custom middleware for Supabase token verification
+
+**Build and Development Tooling**:
+- Hot reload: `cargo-watch` for backend, Trunk for frontend
+- Pre-commit hooks: `cargo-husky` for format and lint checks
+- WASM optimization: `wasm-opt` for production builds
+- Asset handling: Store in `assets/` within each package, use `include_bytes!()` or serve via HTTP
+
+**Learning from React Implementation**:
+- Adopt shared package architecture (types, utils, api-client, i18n, ui-components)
+- Follow -frt/-srv naming convention with base/ subdirectories
+- Do NOT port bad patterns from React - analyze and improve
+- Avoid porting incomplete features or legacy Flowise code
+- Consult React implementation for architectural concepts, not direct code translation
+
+**References**:
+- React repository: https://github.com/teknokomo/universo-platformo-react
+- Yew documentation: https://yew.rs/
+- Actix Web documentation: https://actix.rs/
+- Cargo workspace best practices: https://doc.rust-lang.org/cargo/reference/workspaces.html
+
+**Rationale**: This principle integrates lessons from the React implementation with modern Rust ecosystem best practices. The React version demonstrated that shared infrastructure packages dramatically reduce code duplication (e.g., 7692 lines eliminated in chat components). Rust's strong type system enables even better compile-time guarantees for frontend-backend communication through shared types, preventing entire classes of runtime errors.
 
 ### VIII. Repository Boundaries and Exclusions
 
@@ -426,4 +475,4 @@ Development tooling and workflows MUST be standardized across the project:
 
 **Rationale**: The React implementation uses various tools (Vite, Vitest, ESLint, Prettier, Husky) to ensure development velocity and code quality. Standardizing equivalent Rust tooling from day one prevents ad-hoc tool adoption and ensures consistent developer experience.
 
-**Version**: 1.5.0 | **Ratified**: 2025-11-15 | **Last Amended**: 2025-11-17
+**Version**: 1.6.0 | **Ratified**: 2025-11-15 | **Last Amended**: 2025-11-18
