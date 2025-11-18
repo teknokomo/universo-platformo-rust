@@ -1,9 +1,13 @@
 # Architectural Updates Summary
 
 **Date**: 2025-11-17  
+**Constitution Version**: 1.5.0 (Unconditional modular architecture - UPDATED)  
+**Specification Version**: 3.1.0 (Mandatory package structure - UPDATED)  
 **Task**: Complete deep architectural comparison with React source project  
 **Related Issue**: Update project plans with architectural patterns from source project  
 **Previous State**: Initial analysis in progress, stopped mid-way
+
+**⚠️ CRITICAL UPDATE**: Constitution and Specification updated to make modular package architecture UNCONDITIONAL and NON-NEGOTIABLE. ALL functionality MUST be in `packages/` directory.
 
 ---
 

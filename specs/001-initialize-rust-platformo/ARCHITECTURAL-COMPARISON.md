@@ -4,14 +4,19 @@
 
 This document captures the comprehensive analysis of the Universo Platformo React repository to identify architectural patterns, concepts, and best practices that should be incorporated into the Rust implementation.
 
-**Analysis Date**: 2025-11-16  
+**Analysis Date**: 2025-11-16 (Updated: 2025-11-17)  
+**Constitution Version**: 1.5.0 (Unconditional modular architecture - UPDATED 2025-11-17)  
+**Specification Version**: 3.1.0 (Mandatory package structure - UPDATED 2025-11-17)  
 **React Repository**: https://github.com/teknokomo/universo-platformo-react  
 **React Version Analyzed**: 0.38.0-alpha  
 **Source Commit**: 5e315c5455bec753ed45494a79c9c3d38630450a
 
+**⚠️ CRITICAL UPDATE**: Constitution and Specification updated to make modular package architecture UNCONDITIONAL. ALL functionality in Rust implementation MUST be in `packages/` directory, mirroring the React repository's proven pattern.
+
 ## Executive Summary
 
 The React implementation has evolved significantly beyond the initial conception and includes sophisticated patterns for:
+- **Modular package architecture** (ALL functionality in packages/ directory - NOW MANDATORY in Rust)
 - **Shared package infrastructure** (types, utils, API client, i18n)
 - **Template system** for multi-platform export (AR.js, PlayCanvas)
 - **UPDL** (Universal Platform Description Language) node system
