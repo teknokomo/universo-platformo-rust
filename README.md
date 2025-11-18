@@ -86,18 +86,52 @@ This repository implements the same conceptual foundation as [Universo Platformo
 -   Rust (stable)
 -   Yew (WebAssembly framework)
 -   Material Design components (Rust ecosystem equivalents)
+-   Build: Trunk for development, wasm-pack for library builds
+-   State Management: Yewdux for global state, use_reducer for local state
 
 **Backend:**
 -   Rust (stable)
 -   Actix Web
 -   Supabase (primary database)
 -   Database abstraction layer for future DBMS support
+-   SQLx for type-safe database queries
+-   actix-web-httpauth for authentication
 
 **Development:**
 -   Cargo workspaces (monorepo management)
 -   rustfmt (code formatting)
 -   clippy (linting)
--   cargo-watch (development automation)
+-   cargo-watch (development automation and hot reload)
+-   wasm-bindgen-test (frontend testing)
+-   actix-web::test (backend testing)
+
+**Inter-Package Communication:**
+-   Shared types in `universo-types` crate with serde traits
+-   Compile-time type safety for frontend-backend communication
+-   HTTP client in `universo-api-client` crate using reqwest
+-   Repository pattern with traits for database abstraction
+
+## Best Practices for Rust Fullstack
+
+This project follows modern Rust fullstack development patterns. For detailed examples and guidance, see:
+
+- **Constitution Principle VII**: Complete Rust ecosystem best practices ([.specify/memory/constitution.md](./.specify/memory/constitution.md))
+- **Architectural Comparison**: Rust technology stack integration guide ([specs/001-initialize-rust-platformo/ARCHITECTURAL-COMPARISON.md](./specs/001-initialize-rust-platformo/ARCHITECTURAL-COMPARISON.md))
+
+**Key Patterns**:
+
+1. **Frontend (Yew)**: Function components with hooks (use_state, use_reducer), typed props with Properties trait, HTML macro for templates
+2. **Backend (Actix Web)**: Async handlers, typed extractors (Json<T>, Path<T>), middleware via .wrap()
+3. **Shared Types**: All API contracts and entities in universo-types crate with Serialize/Deserialize traits
+4. **Database**: Repository trait pattern with async_trait, SQLx for compile-time query verification
+5. **Build Tools**: Trunk for frontend dev server with hot reload, cargo-watch for backend
+6. **Testing**: wasm-bindgen-test for Yew components, actix-web::test for API endpoints
+
+**Learning from React Implementation**:
+- Adopt proven shared infrastructure packages (types, utils, api-client, i18n, ui-components)
+- Follow -frt/-srv naming convention with base/ subdirectories
+- Leverage Rust's type system for better compile-time guarantees than TypeScript
+- Use Cargo workspace.dependencies for centralized version management
 
 ## Project Structure
 

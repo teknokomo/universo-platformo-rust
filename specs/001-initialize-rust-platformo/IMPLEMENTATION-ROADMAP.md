@@ -6,9 +6,29 @@ This document provides a practical roadmap for implementing Universo Platformo R
 
 **CRITICAL**: ALL functionality MUST be implemented as packages in `packages/` directory. This is NON-NEGOTIABLE.
 
-**Last Updated**: 2025-11-17  
-**Constitution Version**: 1.5.0 (Strengthened modular requirements)
+**Last Updated**: 2025-11-18  
+**Constitution Version**: 1.6.0 (Rust ecosystem best practices integration)
 **Specification Version**: 3.1.0 (Added mandatory package structure)
+
+## Technology Stack and Best Practices
+
+**Comprehensive Guide**: See ARCHITECTURAL-COMPARISON.md "Rust Technology Stack Best Practices Integration" section for detailed code examples and patterns.
+
+**Key Technologies**:
+- **Frontend**: Yew 0.21+ with function components, hooks (use_state, use_reducer), Trunk for dev server
+- **Backend**: Actix Web 4.x with async handlers, typed extractors, middleware via .wrap()
+- **Shared Types**: universo-types crate with serde traits for compile-time type safety
+- **Database**: SQLx with repository trait pattern for type-safe queries
+- **HTTP Client**: reqwest in universo-api-client crate
+- **State Management**: Yewdux for complex global state, use_reducer for local state
+- **Build Tools**: cargo-watch (backend hot reload), Trunk (frontend dev server), cargo workspace commands
+- **Testing**: wasm-bindgen-test (frontend), actix-web::test (backend)
+
+**Best Practices References**:
+- Constitution Principle VII: "Best Practices for Rust Fullstack" (v1.6.0)
+- ARCHITECTURAL-COMPARISON.md: Complete Rust patterns with code examples
+- Yew documentation: https://yew.rs/
+- Actix Web documentation: https://actix.rs/
 
 ## Quick Reference
 
