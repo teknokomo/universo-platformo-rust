@@ -116,7 +116,7 @@ This repository implements the same conceptual foundation as [Universo Platformo
 This project follows modern Rust fullstack development patterns. For detailed examples and guidance, see:
 
 - **Constitution Principle VII**: Complete Rust ecosystem best practices ([.specify/memory/constitution.md](./.specify/memory/constitution.md))
-- **Architectural Comparison**: Rust technology stack integration guide ([specs/001-initialize-rust-platformo/ARCHITECTURAL-COMPARISON.md](./specs/001-initialize-rust-platformo/ARCHITECTURAL-COMPARISON.md))
+- **Architectural Comparison**: Rust technology stack integration guide ([.specify/specs/001-initialize-rust-platformo/ARCHITECTURAL-COMPARISON.md](./.specify/specs/001-initialize-rust-platformo/ARCHITECTURAL-COMPARISON.md))
 
 **Key Patterns**:
 

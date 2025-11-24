@@ -116,7 +116,7 @@ Universo Platformo Rust - это проект, который переосмыс
 Этот проект следует современным паттернам разработки fullstack на Rust. Для подробных примеров и руководства см.:
 
 - **Принцип VII Конституции**: Полные лучшие практики экосистемы Rust ([.specify/memory/constitution.md](./.specify/memory/constitution.md))
-- **Архитектурное сравнение**: Руководство по интеграции технологического стека Rust ([specs/001-initialize-rust-platformo/ARCHITECTURAL-COMPARISON.md](./specs/001-initialize-rust-platformo/ARCHITECTURAL-COMPARISON.md))
+- **Архитектурное сравнение**: Руководство по интеграции технологического стека Rust ([.specify/specs/001-initialize-rust-platformo/ARCHITECTURAL-COMPARISON.md](./.specify/specs/001-initialize-rust-platformo/ARCHITECTURAL-COMPARISON.md))
 
 **Ключевые паттерны**:
 
