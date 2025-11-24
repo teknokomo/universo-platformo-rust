@@ -1,6 +1,6 @@
 # Tasks: Initialize Universo Platformo Rust Project
 
-**Input**: Design documents from `/specs/001-initialize-rust-platformo/`
+**Input**: Design documents from `/.specify/specs/001-initialize-rust-platformo/`
 **Prerequisites**: plan.md, spec.md, research.md, data-model.md, contracts/
 
 **Tests**: Tests are NOT explicitly requested in the specification, therefore NO test tasks are included.
