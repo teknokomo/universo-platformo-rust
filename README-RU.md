@@ -116,7 +116,7 @@ Universo Platformo Rust - это проект, который переосмыс
 Этот проект следует современным паттернам разработки fullstack на Rust. Для подробных примеров и руководства см.:
 
 - **Принцип VII Конституции**: Полные лучшие практики экосистемы Rust ([.specify/memory/constitution.md](./.specify/memory/constitution.md))
-- **Архитектурное сравнение**: Руководство по интеграции технологического стека Rust ([specs/001-initialize-rust-platformo/ARCHITECTURAL-COMPARISON.md](./specs/001-initialize-rust-platformo/ARCHITECTURAL-COMPARISON.md))
+- **Архитектурное сравнение**: Руководство по интеграции технологического стека Rust ([.specify/specs/001-initialize-rust-platformo/ARCHITECTURAL-COMPARISON.md](./.specify/specs/001-initialize-rust-platformo/ARCHITECTURAL-COMPARISON.md))
 
 **Ключевые паттерны**:
 
@@ -185,11 +185,11 @@ universo-platformo-rust/
 │   │   └── base/              # Основная реализация Rust/Actix
 │   ├── [feature]-frt/         # Другие пакеты фронтенда
 │   └── [feature]-srv/         # Другие пакеты бэкенда
-├── specs/                     # Спецификации функций
-│   └── 001-initialize-rust-platformo/
 ├── .specify/                  # Инструменты рабочего процесса спецификации
 │   ├── memory/                # Конституция и память проекта
 │   ├── scripts/               # Скрипты автоматизации
+│   ├── specs/                 # Спецификации функций
+│   │   └── 001-initialize-rust-platformo/
 │   └── templates/             # Шаблоны документов
 ├── .github/
 │   └── instructions/          # Руководства по разработке
@@ -234,7 +234,7 @@ universo-platformo-rust/
 
 1. **Фаза планирования:**
    - Создать GitHub Issue (следуя `.github/instructions/github-issues.md`)
-   - Написать спецификацию функции в `specs/[###-feature-name]/spec.md`
+   - Написать спецификацию функции в `.specify/specs/[###-feature-name]/spec.md`
    - Получить одобрение спецификации
 
 2. **Фаза реализации:**

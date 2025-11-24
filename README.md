@@ -116,7 +116,7 @@ This repository implements the same conceptual foundation as [Universo Platformo
 This project follows modern Rust fullstack development patterns. For detailed examples and guidance, see:
 
 - **Constitution Principle VII**: Complete Rust ecosystem best practices ([.specify/memory/constitution.md](./.specify/memory/constitution.md))
-- **Architectural Comparison**: Rust technology stack integration guide ([specs/001-initialize-rust-platformo/ARCHITECTURAL-COMPARISON.md](./specs/001-initialize-rust-platformo/ARCHITECTURAL-COMPARISON.md))
+- **Architectural Comparison**: Rust technology stack integration guide ([.specify/specs/001-initialize-rust-platformo/ARCHITECTURAL-COMPARISON.md](./.specify/specs/001-initialize-rust-platformo/ARCHITECTURAL-COMPARISON.md))
 
 **Key Patterns**:
 
@@ -185,11 +185,11 @@ universo-platformo-rust/
 │   │   └── base/              # Primary Rust/Actix implementation
 │   ├── [feature]-frt/         # Other frontend packages
 │   └── [feature]-srv/         # Other backend packages
-├── specs/                     # Feature specifications
-│   └── 001-initialize-rust-platformo/
 ├── .specify/                  # Specification workflow tools
 │   ├── memory/                # Constitution and project memory
 │   ├── scripts/               # Automation scripts
+│   ├── specs/                 # Feature specifications
+│   │   └── 001-initialize-rust-platformo/
 │   └── templates/             # Document templates
 ├── .github/
 │   └── instructions/          # Development guidelines
@@ -234,7 +234,7 @@ Future development will include the Spaces/Canvases functionality for creating v
 
 1. **Planning Phase:**
    - Create GitHub Issue (following `.github/instructions/github-issues.md`)
-   - Write feature specification in `specs/[###-feature-name]/spec.md`
+   - Write feature specification in `.specify/specs/[###-feature-name]/spec.md`
    - Get specification approval
 
 2. **Implementation Phase:**
