@@ -11,7 +11,7 @@ A comprehensive project review has been conducted based on the initial project r
 ## Documents Generated
 
 ### 1. Requirements Quality Checklist
-**Location**: `specs/001-initialize-rust-platformo/checklists/project-review.md`
+**Location**: `.specify/specs/001-initialize-rust-platformo/checklists/project-review.md`
 
 - **100 validation items** organized by quality dimensions
 - Tests whether requirements are complete, clear, consistent, measurable, and cover all scenarios
@@ -19,7 +19,7 @@ A comprehensive project review has been conducted based on the initial project r
 - Each item references specific specification sections or identifies gaps
 
 ### 2. Project Review Summary
-**Location**: `specs/001-initialize-rust-platformo/project-review-summary.md`
+**Location**: `.specify/specs/001-initialize-rust-platformo/project-review-summary.md`
 
 - Executive summary of findings
 - Detailed analysis of strengths, gaps, and ambiguities
@@ -100,8 +100,8 @@ The project has excellent foundational requirements:
 
 ## Next Steps
 
-1. Review the 100-item checklist in `specs/001-initialize-rust-platformo/checklists/project-review.md`
-2. Read detailed analysis in `specs/001-initialize-rust-platformo/project-review-summary.md`
+1. Review the 100-item checklist in `.specify/specs/001-initialize-rust-platformo/checklists/project-review.md`
+2. Read detailed analysis in `.specify/specs/001-initialize-rust-platformo/project-review-summary.md`
 3. Address immediate priority gaps before starting Phase 2 implementation
 4. Use checklist to track requirement quality improvements
 5. Proceed with Phase 1 implementation (repository is ready)
@@ -133,7 +133,7 @@ Track these metrics to validate requirement quality improvements:
 ## Созданные документы
 
 ### 1. Контрольный список качества требований
-**Расположение**: `specs/001-initialize-rust-platformo/checklists/project-review.md`
+**Расположение**: `.specify/specs/001-initialize-rust-platformo/checklists/project-review.md`
 
 - **100 проверочных пунктов**, организованных по измерениям качества
 - Проверяет, являются ли требования полными, ясными, последовательными, измеримыми и охватывают ли все сценарии
@@ -141,7 +141,7 @@ Track these metrics to validate requirement quality improvements:
 - Каждый пункт ссылается на конкретные разделы спецификации или выявляет пробелы
 
 ### 2. Сводка проверки проекта
-**Расположение**: `specs/001-initialize-rust-platformo/project-review-summary.md`
+**Расположение**: `.specify/specs/001-initialize-rust-platformo/project-review-summary.md`
 
 - Краткое изложение результатов
 - Подробный анализ сильных сторон, пробелов и неоднозначностей
@@ -222,8 +222,8 @@ Track these metrics to validate requirement quality improvements:
 
 ## Следующие шаги
 
-1. Просмотреть контрольный список из 100 пунктов в `specs/001-initialize-rust-platformo/checklists/project-review.md`
-2. Прочитать подробный анализ в `specs/001-initialize-rust-platformo/project-review-summary.md`
+1. Просмотреть контрольный список из 100 пунктов в `.specify/specs/001-initialize-rust-platformo/checklists/project-review.md`
+2. Прочитать подробный анализ в `.specify/specs/001-initialize-rust-platformo/project-review-summary.md`
 3. Устранить пробелы с немедленным приоритетом перед началом реализации Фазы 2
 4. Использовать контрольный список для отслеживания улучшения качества требований
 5. Приступить к реализации Фазы 1 (репозиторий готов)

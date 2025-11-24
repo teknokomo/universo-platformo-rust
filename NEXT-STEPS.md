@@ -13,7 +13,7 @@ The Universo Platformo Rust project specification has been comprehensively enhan
 ## Key Documents to Review
 
 ### 1. Enhanced Specification (MUST READ)
-**Location**: `specs/001-initialize-rust-platformo/spec.md`
+**Location**: `.specify/specs/001-initialize-rust-platformo/spec.md`
 
 This is the core document with all improvements:
 - 30 Functional Requirements (FR-001 to FR-030)
@@ -30,14 +30,14 @@ This is the core document with all improvements:
 - Traceability matrix
 
 ### 2. Improvement Summary (Quick Reference)
-**Location**: `specs/001-initialize-rust-platformo/IMPROVEMENT-SUMMARY.md`
+**Location**: `.specify/specs/001-initialize-rust-platformo/IMPROVEMENT-SUMMARY.md`
 
 Quick overview of what changed and why.
 
 ### 3. Comprehensive Review (Detailed Analysis)
 **Locations**: 
-- English: `specs/001-initialize-rust-platformo/project-review-summary-v2.md`
-- Russian: `specs/001-initialize-rust-platformo/project-review-summary-v2-RU.md`
+- English: `.specify/specs/001-initialize-rust-platformo/project-review-summary-v2.md`
+- Russian: `.specify/specs/001-initialize-rust-platformo/project-review-summary-v2-RU.md`
 
 Complete analysis of improvements with metrics and readiness assessment.
 
@@ -51,8 +51,8 @@ New principles:
 
 ### 5. Validation Checklists
 **Locations**:
-- `specs/001-initialize-rust-platformo/checklists/requirements.md` - All pass ✅
-- `specs/001-initialize-rust-platformo/checklists/project-review.md` - 95/100 complete ✅
+- `.specify/specs/001-initialize-rust-platformo/checklists/requirements.md` - All pass ✅
+- `.specify/specs/001-initialize-rust-platformo/checklists/project-review.md` - 95/100 complete ✅
 
 ## Recommended Next Actions
 
