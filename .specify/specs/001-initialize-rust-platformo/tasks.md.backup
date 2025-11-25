@@ -1,111 +1,17 @@
 # Tasks: Initialize Universo Platformo Rust Project
 
 **Input**: Design documents from `/.specify/specs/001-initialize-rust-platformo/`
-**Prerequisites**: plan.md, spec.md, research.md, data-model.md, contracts/, ARCHITECTURAL-COMPARISON.md, IMPLEMENTATION-ROADMAP.md
+**Prerequisites**: plan.md, spec.md, research.md, data-model.md, contracts/
 
 **Tests**: Tests are NOT explicitly requested in the specification, therefore NO test tasks are included.
 
 **Organization**: Tasks are grouped by user story to enable independent implementation and testing of each story.
-
-**Scope**: This tasks.md covers **Phase 1: Foundation + Shared Infrastructure** from IMPLEMENTATION-ROADMAP.md. Future features (Authentication, Uniks, Metaverses, Spaces/Canvases, Node Libraries, Publication System) will be implemented in subsequent feature branches following the established patterns.
 
 ## Format: `- [ ] [ID] [P?] [Story?] Description`
 
 - **[P]**: Can run in parallel (different files, no dependencies)
 - **[Story]**: Which user story this task belongs to (e.g., US1, US2, US3, US4)
 - All tasks include exact file paths
-
-## Critical Architecture Principles
-
-⚠️ **MANDATORY MODULAR STRUCTURE**: ALL application functionality MUST be implemented as packages in `packages/` directory. Repository root is ONLY for workspace configuration.
-
-📋 **Package Naming Convention**: 
-- Frontend packages: `[feature]-frt` (e.g., `auth-frt`, `spaces-frt`)
-- Backend packages: `[feature]-srv` (e.g., `auth-srv`, `spaces-srv`)
-- Shared packages: `universo-[name]` (e.g., `universo-types`, `universo-utils`)
-- Each package contains `base/` subdirectory for main implementation
-
-🎯 **Future-Ready Structure**: This initialization establishes patterns for:
-- **Authentication** → auth-frt/auth-srv packages (Phase 2)
-- **Uniks (Workspaces)** → uniks-frt/uniks-srv packages (Phase 3)
-- **Metaverses** → metaverses-frt/metaverses-srv packages (Phase 3)
-- **Spaces/Canvases** → spaces-frt/spaces-srv packages with node system (Phase 4)
-- **Node Libraries** → LangChain and UPDL node packages (Phase 4)
-- **Publication System** → publish-frt/publish-srv packages (Phase 5)
-
-## Relationship to Universo Platformo React
-
-This Rust implementation mirrors the proven package architecture from [Universo Platformo React](https://github.com/teknokomo/universo-platformo-react/tree/main/packages) while applying Rust ecosystem best practices:
-
-### Key Differences from React Version
-
-1. **Optimal Package Separation from Start**
-   - React repo has monolithic Flowise packages that will be split later
-   - Rust implementation creates properly separated packages immediately
-   - Avoid technical debt by planning modular structure from beginning
-
-2. **Technology Stack Adaptations**
-   - React/TypeScript → Rust/Yew (WASM)
-   - Express.js → Actix Web
-   - TypeORM → SQLx with repository traits
-   - PNPM workspaces → Cargo workspaces
-   - Material-UI → Yew Material components
-
-3. **Shared Infrastructure First**
-   - React repo added shared packages (`@universo/types`, `@universo/utils`) after discovering duplication
-   - Rust implementation creates shared packages (universo-types, universo-utils, etc.) in Phase 1
-   - Prevents code duplication from the start
-
-### Functionality Progression (Matching React Patterns)
-
-The development will follow this progression, similar to React version:
-
-1. **Foundation** (This Phase) → Repository setup, shared packages
-2. **Authentication** → Login/registration pages, session management
-3. **Uniks/Workspaces** → User workspace management
-4. **Clusters** → Three-entity pattern (Clusters/Domains/Resources)
-5. **Metaverses** → Three-entity pattern (Metaverses/Sections/Entities)
-6. **Spaces/Canvases** → Visual flow editor for node-based development
-7. **Node Libraries**:
-   - UPDL nodes (Scene, Entity, Transform, Material, Interaction, Animation, Export)
-   - LangChain integration nodes (from flowise-components pattern)
-   - Custom node system extensibility
-8. **Template System** → Multi-platform export (AR.js, PlayCanvas, Babylon.js, Three.js)
-9. **Publication System** → Share and discover published experiences
-10. **Advanced Features** → Space Builder (AI-assisted), Multiplayer, Analytics
-
-### React Package Reference
-
-For developers familiar with the React version, here's the mapping:
-
-| React Package | Rust Equivalent | Notes |
-|--------------|-----------------|-------|
-| `@universo/types` | `universo-types` | Shared type definitions |
-| `@universo/utils` | `universo-utils` | Common utilities, UPDL processor |
-| `@universo/api-client` | `universo-api-client` | HTTP client |
-| `@universo/i18n` | `universo-i18n` | Internationalization |
-| `flowise-template-mui` | `universo-ui-components` | Yew components |
-| `auth-frt` | `auth-frt` | Authentication frontend |
-| `auth-srv` | `auth-srv` | Authentication backend |
-| `clusters-frt` | `clusters-frt` | Clusters frontend |
-| `clusters-srv` | `clusters-srv` | Clusters backend |
-| `metaverses-frt` | `metaverses-frt` | Metaverses frontend |
-| `metaverses-srv` | `metaverses-srv` | Metaverses backend |
-| `spaces-frt` | `spaces-frt` | Spaces/Canvases frontend |
-| `spaces-srv` | `spaces-srv` | Spaces/Canvases backend |
-| `updl/base` | `updl-nodes` | UPDL node definitions |
-| `flowise-components` | `langchain-nodes` | Will be properly separated |
-| `template-quiz` | `template-arjs` | AR.js template |
-| `template-mmoomm` | `template-playcanvas` | PlayCanvas template |
-| `publish-frt` | `publish-frt` | Publication frontend |
-| `publish-srv` | `publish-srv` | Publication backend |
-| `space-builder-frt` | `space-builder-frt` | AI-assisted flow generation |
-| `space-builder-srv` | `space-builder-srv` | LLM integration |
-
-**Critical Learning**: The React version has `flowise-components` (17MB CJS, 5.2MB ESM) which contains mixed functionality that should be separated. The Rust implementation will avoid this by:
-- Creating separate packages for LangChain nodes, UPDL nodes, and core components from the start
-- Using clear package boundaries and dependencies
-- Following the optimal structure learned from React version's evolution
 
 ## Phase 1: Setup (Project Initialization)
 
@@ -125,13 +31,6 @@ For developers familiar with the React version, here's the mapping:
 **Purpose**: Core infrastructure packages that MUST be complete before ANY user story can be implemented
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete
-
-**Architecture Reference**: These packages mirror the proven patterns from Universo Platformo React:
-- `@universo/types` → `universo-types` (shared type definitions)
-- `@universo/utils` → `universo-utils` (common utilities, UPDL processor)
-- `@universo/api-client` → `universo-api-client` (HTTP client)
-- `@universo/i18n` → `universo-i18n` (internationalization)
-- Material UI components → `universo-ui-components` (Yew components)
 
 ### Shared Type Package (universo-types)
 
@@ -653,11 +552,11 @@ Each addition builds on previous work without breaking existing functionality.
 
 **Total Tasks**: 165
 - Phase 1 (Setup): 6 tasks
-- Phase 2 (Foundational): 35 tasks (5 shared infrastructure packages)
-- Phase 3 (User Story 1 - Repository Setup): 20 tasks
-- Phase 4 (User Story 2 - Issue Labels): 20 tasks
-- Phase 5 (User Story 3 - Package Structure): 18 tasks
-- Phase 6 (User Story 4 - Dev Environment): 39 tasks
+- Phase 2 (Foundational): 35 tasks (5 shared packages)
+- Phase 3 (User Story 1): 20 tasks
+- Phase 4 (User Story 2): 20 tasks
+- Phase 5 (User Story 3): 18 tasks
+- Phase 6 (User Story 4): 39 tasks
 - Phase 7 (Polish): 27 tasks
 
 **Parallel Opportunities**: 
@@ -671,127 +570,11 @@ Each addition builds on previous work without breaking existing functionality.
 
 **Full Delivery**: All 7 phases (165 tasks)
 - Complete foundation for Universo Platformo Rust
-- Ready for feature development (Authentication, Clusters, Metaverses, Spaces, etc.)
+- Ready for feature development (Clusters, Metaverses, etc.)
 
 **Estimated Effort**:
 - MVP (Phases 1-3): 3-5 days (serial) or 2-3 days (parallel team)
 - Full (All phases): 3-4 weeks (serial) or 1-2 weeks (parallel team)
 
-**Next Phases After Completion** (see IMPLEMENTATION-ROADMAP.md):
-- **Phase 2**: UPDL System and Clusters Feature (5-7 weeks)
-- **Phase 3**: Authentication and Profile Management (3-4 weeks)
-- **Phase 4**: Uniks (Workspaces) Feature (4-5 weeks)
-- **Phase 5**: Metaverses Feature (4-5 weeks)
-- **Phase 6**: Spaces/Canvases with Node System (6-8 weeks)
-  - Visual flow editor integration
-  - LangChain node library
-  - UPDL node library
-  - Node execution engine
-- **Phase 7**: Template System (AR.js, PlayCanvas) (5-6 weeks)
-- **Phase 8**: Publication System (4-5 weeks)
-  - Publish flows as public experiences
-  - Sharing and discovery features
-- **Phase 9+**: Advanced Features
-  - Space Builder (AI-assisted flow generation)
-  - Multiplayer infrastructure
-  - Analytics dashboard
-  - OAuth2 authentication
-  - Additional template platforms
-
-## Package Structure Reference
-
-This initialization creates the foundation for a well-organized package ecosystem:
-
-### Shared Infrastructure (Created in Phase 1)
-```
-packages/
-├── universo-types/base/         # Shared type definitions
-├── universo-utils/base/         # Common utilities, UPDL processor
-├── universo-api-client/base/    # Centralized HTTP client
-├── universo-i18n/base/          # Internationalization (EN/RU)
-└── universo-ui-components/base/ # Reusable Yew components
-```
-
-### Domain Features (Future Phases)
-```
-packages/
-├── auth-frt/base/               # Authentication frontend (Phase 2)
-├── auth-srv/base/               # Authentication backend (Phase 2)
-├── profile-frt/base/            # User profile frontend (Phase 2)
-├── profile-srv/base/            # User profile backend (Phase 2)
-├── clusters-frt/base/           # Clusters frontend (Phase 2)
-├── clusters-srv/base/           # Clusters backend (Phase 2)
-├── uniks-frt/base/              # Uniks/Workspaces frontend (Phase 4)
-├── uniks-srv/base/              # Uniks/Workspaces backend (Phase 4)
-├── metaverses-frt/base/         # Metaverses frontend (Phase 5)
-├── metaverses-srv/base/         # Metaverses backend (Phase 5)
-├── spaces-frt/base/             # Spaces frontend (Phase 6)
-├── spaces-srv/base/             # Spaces backend (Phase 6)
-├── publish-frt/base/            # Publication system frontend (Phase 8)
-├── publish-srv/base/            # Publication system backend (Phase 8)
-├── analytics-frt/base/          # Analytics dashboard (Phase 9+)
-└── analytics-srv/base/          # Analytics backend (Phase 9+)
-```
-
-### Node Libraries (Phase 6)
-```
-packages/
-├── updl-nodes/base/             # UPDL node definitions
-├── langchain-nodes/base/        # LangChain integration nodes
-├── node-executor/base/          # Node execution engine
-└── flowise-components/base/     # Adapted Flowise components (if needed)
-```
-
-### Template System (Phase 7)
-```
-packages/
-├── template-arjs/base/          # AR.js template exporter
-├── template-playcanvas/base/    # PlayCanvas template exporter
-├── template-babylonjs/base/     # Babylon.js template (future)
-└── template-threejs/base/       # Three.js template (future)
-```
-
-### Support Packages (Phase 9+)
-```
-packages/
-├── multiplayer-srv/base/        # Multiplayer server (WebSocket/game server)
-├── space-builder-frt/base/      # AI-assisted flow generation UI
-├── space-builder-srv/base/      # LLM integration backend
-└── health-srv/base/             # Health check service
-```
-
-## Best Practices for Future Development
-
-When implementing features in subsequent phases, follow these patterns established in this initialization:
-
-### 1. Package Separation
-- **Always separate frontend and backend** into `-frt` and `-srv` packages
-- **Share types** through `universo-types` package
-- **Reuse components** from `universo-ui-components`
-- **Use centralized HTTP client** from `universo-api-client`
-
-### 2. UPDL Integration (from ARCHITECTURAL-COMPARISON.md)
-- All visual nodes should produce UPDL output
-- UPDL processor converts flow graphs to UPDL structures
-- Templates consume UPDL and generate platform-specific code
-- Maintain platform-agnostic abstractions
-
-### 3. Technology Stack (from research.md and constitution v1.6.0)
-- **Frontend**: Yew function components with hooks (use_state, use_effect, use_reducer)
-- **Backend**: Actix Web with async handlers, typed extractors, middleware
-- **State Management**: Yewdux for global state, use_reducer for local state
-- **Database**: SQLx with repository trait pattern for type-safe queries
-- **Build**: Trunk for frontend dev server, cargo-watch for backend hot reload
-
-### 4. Code Quality Standards
-- **Zero clippy warnings** policy
-- **rustfmt** formatted code
-- **Comprehensive documentation** with examples
-- **Bilingual docs** (EN/RU) with identical structure
-- **Unit and integration tests** for all packages
-
-### 5. Lessons from React Implementation (ARCHITECTURAL-COMPARISON.md)
-- **Component extraction** saved 7,692 lines of duplication - plan sharing from start
-- **Centralized type system** prevented type conflicts - use universo-types everywhere
-- **UPDL as abstraction** enabled multi-platform export - design for extensibility
-- **Template system** kept platform logic separate - maintain clear boundaries
+**Next Phase After Completion**:
+Phase 2 of the project roadmap: UPDL System and Clusters Feature implementation
