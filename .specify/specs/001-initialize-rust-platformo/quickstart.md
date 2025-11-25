@@ -142,15 +142,22 @@ trunk build --release
 
 ```bash
 # Terminal 1: Backend server (Phase 2+)
-cd packages/universo-api-srv/base
+# Use domain-specific backend packages, e.g.:
+cd packages/clusters-srv/base
 cargo watch -x run
 
+# Or for auth:
+# cd packages/auth-srv/base
+# cargo watch -x run
+
 # Terminal 2: Frontend dev server (Phase 2+)
-cd packages/universo-web-frt/base
+cd packages/clusters-frt/base
 trunk serve --port 8081
 
 # Access at: http://localhost:8081
 ```
+
+**Note**: There is no single `universo-api-srv` package. Each domain has its own `-srv` backend package following the modular architecture pattern.
 
 ---
 
