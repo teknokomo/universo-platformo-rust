@@ -506,7 +506,9 @@ pub struct BuildArtifacts {
 }
 ```
 
-#### 2. AR.js Template (`packages/template-arjs/base/`)
+#### 2. Quiz Template (`packages/template-quiz/base/`)
+
+**Note**: Package is named `template-quiz` to match the React repository convention. The underlying technology is AR.js.
 
 ```rust
 // src/lib.rs
@@ -514,9 +516,9 @@ pub struct BuildArtifacts {
 use universo_utils::template::Template;
 use universo_types::updl::UPDL;
 
-pub struct ARJSTemplate;
+pub struct QuizTemplate;
 
-impl Template for ARJSTemplate {
+impl Template for QuizTemplate {
     fn name(&self) -> &str { "AR.js Educational Quiz" }
     fn platform(&self) -> &str { "arjs" }
     
@@ -556,15 +558,15 @@ impl Template for ARJSTemplate {
 
 **Deliverables**:
 - Template trait interface
-- AR.js template implementation
+- Quiz (AR.js) template implementation
 - Generated AR.js experiences working in browser
 - Template documentation and examples
 
-### Weeks 15-17: PlayCanvas Template
+### Weeks 15-17: MMOOMM Template (PlayCanvas)
 
-**Goal**: Second template platform demonstrating pattern reusability.
+**Goal**: Second template platform (`template-mmoomm`) demonstrating pattern reusability.
 
-**Tasks**: Similar to AR.js but for PlayCanvas engine.
+**Tasks**: Similar to Quiz template but for PlayCanvas engine, creating space MMO experiences.
 
 ### Weeks 18-19: Publication System
 

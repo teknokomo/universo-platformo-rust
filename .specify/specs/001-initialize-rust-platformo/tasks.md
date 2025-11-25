@@ -84,28 +84,42 @@ For developers familiar with the React version, here's the mapping:
 | `@universo/utils` | `universo-utils` | Common utilities, UPDL processor |
 | `@universo/api-client` | `universo-api-client` | HTTP client |
 | `@universo/i18n` | `universo-i18n` | Internationalization |
-| `flowise-template-mui` | `universo-ui-components` | Yew components |
+| `flowise-template-mui` | `universo-ui-components` | Yew components (Rust equivalent) |
+| `universo-rest-docs` | `universo-rest-docs` | API documentation server |
 | `auth-frt` | `auth-frt` | Authentication frontend |
 | `auth-srv` | `auth-srv` | Authentication backend |
+| `profile-frt` | `profile-frt` | User profile frontend |
+| `profile-srv` | `profile-srv` | User profile backend |
+| `organizations-frt` | `organizations-frt` | Organizations frontend |
+| `organizations-srv` | `organizations-srv` | Organizations backend |
 | `clusters-frt` | `clusters-frt` | Clusters frontend |
 | `clusters-srv` | `clusters-srv` | Clusters backend |
 | `metaverses-frt` | `metaverses-frt` | Metaverses frontend |
 | `metaverses-srv` | `metaverses-srv` | Metaverses backend |
+| `uniks-frt` | `uniks-frt` | Uniks/Workspaces frontend |
+| `uniks-srv` | `uniks-srv` | Uniks/Workspaces backend |
 | `spaces-frt` | `spaces-frt` | Spaces/Canvases frontend |
 | `spaces-srv` | `spaces-srv` | Spaces/Canvases backend |
+| `storages-frt` | `storages-frt` | Storages frontend |
+| `storages-srv` | `storages-srv` | Storages backend |
+| `projects-frt` | `projects-frt` | Projects frontend |
+| `projects-srv` | `projects-srv` | Projects backend |
 | `updl/base` | `updl-nodes` | UPDL node definitions |
-| `flowise-components` | `langchain-nodes` | Will be properly separated |
-| `template-quiz` | `template-arjs` | AR.js template |
-| `template-mmoomm` | `template-playcanvas` | PlayCanvas template |
+| `flowise-components` | `langchain-nodes` | Node system (fresh implementation, not a port) |
+| `template-quiz` | `template-quiz` | AR.js Quiz template (same name as React) |
+| `template-mmoomm` | `template-mmoomm` | PlayCanvas MMOOMM template (same name as React) |
 | `publish-frt` | `publish-frt` | Publication frontend |
 | `publish-srv` | `publish-srv` | Publication backend |
+| `analytics-frt` | `analytics-frt` | Analytics dashboard frontend |
 | `space-builder-frt` | `space-builder-frt` | AI-assisted flow generation |
 | `space-builder-srv` | `space-builder-srv` | LLM integration |
+| `multiplayer-colyseus-srv` | `multiplayer-srv` | Multiplayer server (Rust-native) |
 
 **Critical Learning**: The React version has `flowise-components` (17MB CJS, 5.2MB ESM) which contains mixed functionality that should be separated. The Rust implementation will avoid this by:
 - Creating separate packages for LangChain nodes, UPDL nodes, and core components from the start
 - Using clear package boundaries and dependencies
 - Following the optimal structure learned from React version's evolution
+- NOT porting Flowise code - implementing fresh Rust implementations
 
 ## Phase 1: Setup (Project Initialization)
 
@@ -721,12 +735,18 @@ packages/
 ├── profile-srv/base/            # User profile backend (Phase 2)
 ├── clusters-frt/base/           # Clusters frontend (Phase 2)
 ├── clusters-srv/base/           # Clusters backend (Phase 2)
+├── organizations-frt/base/      # Organizations frontend (Phase 3)
+├── organizations-srv/base/      # Organizations backend (Phase 3)
 ├── uniks-frt/base/              # Uniks/Workspaces frontend (Phase 4)
 ├── uniks-srv/base/              # Uniks/Workspaces backend (Phase 4)
 ├── metaverses-frt/base/         # Metaverses frontend (Phase 5)
 ├── metaverses-srv/base/         # Metaverses backend (Phase 5)
 ├── spaces-frt/base/             # Spaces frontend (Phase 6)
 ├── spaces-srv/base/             # Spaces backend (Phase 6)
+├── storages-frt/base/           # Storages frontend (Phase 7)
+├── storages-srv/base/           # Storages backend (Phase 7)
+├── projects-frt/base/           # Projects frontend (Phase 7)
+├── projects-srv/base/           # Projects backend (Phase 7)
 ├── publish-frt/base/            # Publication system frontend (Phase 8)
 ├── publish-srv/base/            # Publication system backend (Phase 8)
 ├── analytics-frt/base/          # Analytics dashboard (Phase 9+)
@@ -738,22 +758,26 @@ packages/
 packages/
 ├── updl-nodes/base/             # UPDL node definitions
 ├── langchain-nodes/base/        # LangChain integration nodes
-├── node-executor/base/          # Node execution engine
-└── flowise-components/base/     # Adapted Flowise components (if needed)
+└── node-executor/base/          # Node execution engine
 ```
+
+**Note**: Unlike the React version which has `flowise-components`, the Rust implementation will NOT port Flowise code. Instead, node functionality will be implemented from scratch in `langchain-nodes` and `updl-nodes` packages using idiomatic Rust patterns.
 
 ### Template System (Phase 7)
 ```
 packages/
-├── template-arjs/base/          # AR.js template exporter
-├── template-playcanvas/base/    # PlayCanvas template exporter
+├── template-quiz/base/          # AR.js Quiz template exporter (equivalent to React template-quiz)
+├── template-mmoomm/base/        # PlayCanvas MMOOMM template exporter (equivalent to React template-mmoomm)
 ├── template-babylonjs/base/     # Babylon.js template (future)
 └── template-threejs/base/       # Three.js template (future)
 ```
 
+**Template Naming Convention**: Template packages are named after their primary functionality (quiz, mmoomm) rather than the underlying technology (arjs, playcanvas), matching the React repository's naming convention for consistency.
+
 ### Support Packages (Phase 9+)
 ```
 packages/
+├── universo-rest-docs/base/     # API documentation server (OpenAPI/Swagger)
 ├── multiplayer-srv/base/        # Multiplayer server (WebSocket/game server)
 ├── space-builder-frt/base/      # AI-assisted flow generation UI
 ├── space-builder-srv/base/      # LLM integration backend
