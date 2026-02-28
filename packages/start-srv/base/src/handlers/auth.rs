@@ -27,6 +27,15 @@ pub async fn login(
     supabase: web::Data<SupabaseClient>,
     body: web::Json<LoginRequest>,
 ) -> Result<HttpResponse, AppError> {
+    // Server-side input validation.
+    // Email is trimmed as leading/trailing whitespace is always unintentional.
+    // Password is checked as-is because leading/trailing spaces may be intentional.
+    if body.email.trim().is_empty() || body.password.is_empty() {
+        return Err(AppError::BadRequest(
+            "Email and password are required".to_string(),
+        ));
+    }
+
     let auth_response = supabase
         .sign_in(&body.email, &body.password)
         .await

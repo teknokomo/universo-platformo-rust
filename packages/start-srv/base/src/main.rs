@@ -5,7 +5,7 @@
 
 use actix_cors::Cors;
 use actix_session::{storage::CookieSessionStore, SessionMiddleware};
-use actix_web::{cookie::Key, middleware::Logger, web, App, HttpServer};
+use actix_web::{cookie::Key, cookie::SameSite, middleware::Logger, web, App, HttpServer};
 use dotenvy::dotenv;
 
 mod config;
@@ -58,6 +58,8 @@ async fn main() -> std::io::Result<()> {
         let session_middleware =
             SessionMiddleware::builder(CookieSessionStore::default(), secret_key.clone())
                 .cookie_secure(cookie_secure)
+                .cookie_http_only(true)
+                .cookie_same_site(SameSite::Lax)
                 .build();
 
         App::new()
