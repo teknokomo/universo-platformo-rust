@@ -1,0 +1,27 @@
+[package]
+name = "start-srv"
+version = "0.1.0"
+edition = "2021"
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[[bin]]
+name = "start-srv"
+path = "src/main.rs"
+
+[dependencies]
+actix-web = "4"
+actix-cors = "0.7"
+actix-session = { version = "0.9", features = ["cookie-session"] }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+reqwest = { version = "0.12", features = ["json"] }
+tokio = { version = "1.0", features = ["full"] }
+dotenvy = "0.15"
+env_logger = "0.11"
+log = "0.4"
+uuid = { version = "1.0", features = ["v4", "serde"] }
+
+[dev-dependencies]
+actix-web = { version = "4", features = ["macros"] }

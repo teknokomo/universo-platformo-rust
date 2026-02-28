@@ -7,7 +7,10 @@ resolver = "2"
 #     "packages/clusters-frt",
 #     "packages/clusters-srv",
 # ]
-members = []
+members = [
+    "packages/start-frt/base",
+    "packages/start-srv/base",
+]
 
 [workspace.package]
 version = "0.1.0"
@@ -17,26 +20,31 @@ license = "Omsk-Open-License"
 repository = "https://github.com/teknokomo/universo-platformo-rust"
 
 [workspace.dependencies]
-# Common dependencies will be defined here for consistency across packages
 # Frontend dependencies (Yew ecosystem)
-# yew = "0.21"
-# yew-router = "0.18"
+yew = { version = "0.21", features = ["csr"] }
+yew-router = "0.18"
 
 # Backend dependencies (Actix ecosystem)
-# actix-web = "4.0"
-# actix-rt = "2.0"
+actix-web = "4"
+actix-cors = "0.7"
+actix-session = { version = "0.9", features = ["cookie-session"] }
+actix-rt = "2"
 
-# Database
-# tokio-postgres = "0.7"
-# sqlx = "0.7"
+# Async runtime
+tokio = { version = "1.0", features = ["full"] }
+
+# HTTP client
+reqwest = { version = "0.12", features = ["json"] }
 
 # Serialization
-# serde = { version = "1.0", features = ["derive"] }
-# serde_json = "1.0"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
 
 # Utilities
-# chrono = "0.4"
-# uuid = { version = "1.0", features = ["v4", "serde"] }
+log = "0.4"
+env_logger = "0.11"
+dotenvy = "0.15"
+uuid = { version = "1.0", features = ["v4", "serde"] }
 
 [profile.dev]
 opt-level = 0

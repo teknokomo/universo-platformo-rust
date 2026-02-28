@@ -1,0 +1,10 @@
+[build]
+# The directory from which assets are served during development
+# Trunk will look for index.html here
+dist = "dist"
+
+[serve]
+# Proxy API calls to the backend server during development
+[[proxy]]
+rewrite = "/api"
+backend = "http://localhost:8080/api"

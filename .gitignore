@@ -3,6 +3,13 @@
 .gigaide
 .cursorrules
 
+# Rust build artifacts
+/target
+**/target/
+
+# Cargo lock file for non-executable crates (libraries)
+# Keep Cargo.lock for binaries/apps
+
 # dependencies
 **/node_modules
 **/package-lock.json
