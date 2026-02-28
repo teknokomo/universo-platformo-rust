@@ -11,12 +11,7 @@ use crate::error::AppError;
 use crate::models::{AuthUser, LoginRequest};
 use crate::supabase::SupabaseClient;
 
-/// Session key used to store the Supabase access token.
-const SESSION_ACCESS_TOKEN: &str = "access_token";
-/// Session key used to store the user ID.
-const SESSION_USER_ID: &str = "user_id";
-/// Session key used to store the user email.
-const SESSION_USER_EMAIL: &str = "user_email";
+use super::{SESSION_ACCESS_TOKEN, SESSION_USER_EMAIL, SESSION_USER_ID};
 
 /// POST /api/v1/auth/login
 ///

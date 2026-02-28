@@ -4,6 +4,7 @@
 //! sign-out, and session validation.
 
 use serde::Deserialize;
+use std::time::Duration;
 
 /// Minimal Supabase Auth API client
 pub struct SupabaseClient {
@@ -39,10 +40,19 @@ struct SupabaseErrorBody {
 impl SupabaseClient {
     /// Create a new Supabase client.
     pub fn new(url: String, anon_key: String) -> Self {
+        // Building a reqwest Client can only fail if TLS initialisation fails,
+        // which is a fatal condition — the server cannot serve any requests without it.
+        let http = reqwest::Client::builder()
+            .timeout(Duration::from_secs(10))
+            .build()
+            .expect(
+                "Failed to build Supabase HTTP client. \
+                Ensure a TLS backend (e.g. rustls or native-tls) is available.",
+            );
         Self {
             url,
             anon_key,
-            http: reqwest::Client::new(),
+            http,
         }
     }
 

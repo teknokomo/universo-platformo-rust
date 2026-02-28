@@ -9,8 +9,17 @@ use actix_web::{web, HttpResponse};
 use crate::error::AppError;
 use crate::models::{JoinItemsRequest, JoinItemsResponse, OnboardingItem, OnboardingItems};
 
+use super::SESSION_ACCESS_TOKEN;
+
 /// Session key for tracking onboarding completion status.
 const SESSION_ONBOARDING_COMPLETED: &str = "onboarding_completed";
+
+/// Known valid project IDs in the onboarding catalog.
+const VALID_PROJECT_IDS: &[&str] = &["project-1", "project-2", "project-3"];
+/// Known valid campaign IDs in the onboarding catalog.
+const VALID_CAMPAIGN_IDS: &[&str] = &["campaign-1", "campaign-2", "campaign-3"];
+/// Known valid cluster IDs in the onboarding catalog.
+const VALID_CLUSTER_IDS: &[&str] = &["cluster-1", "cluster-2", "cluster-3"];
 
 /// GET /api/v1/onboarding/items
 ///
@@ -19,7 +28,7 @@ const SESSION_ONBOARDING_COMPLETED: &str = "onboarding_completed";
 pub async fn get_items(session: Session) -> Result<HttpResponse, AppError> {
     // Check if user is authenticated
     let is_authenticated = session
-        .get::<String>("access_token")
+        .get::<String>(SESSION_ACCESS_TOKEN)
         .map_err(|e| AppError::Internal(format!("Session read error: {}", e)))?
         .is_some();
 
@@ -100,7 +109,7 @@ pub async fn join_items(
 ) -> Result<HttpResponse, AppError> {
     // Check if user is authenticated
     let is_authenticated = session
-        .get::<String>("access_token")
+        .get::<String>(SESSION_ACCESS_TOKEN)
         .map_err(|e| AppError::Internal(format!("Session read error: {}", e)))?
         .is_some();
 
@@ -108,11 +117,30 @@ pub async fn join_items(
         return Err(AppError::Unauthorized("Not authenticated".to_string()));
     }
 
-    // Validate that at least one item was selected in each category
+    // Validate that at least one item was selected across all categories
     if body.project_ids.is_empty() && body.campaign_ids.is_empty() && body.cluster_ids.is_empty() {
         return Err(AppError::BadRequest(
             "At least one item must be selected".to_string(),
         ));
+    }
+
+    // Validate all submitted IDs exist in the known catalog.
+    // This prevents phantom IDs from being accepted silently.
+    // The catalog is a small static set (3 entries each), so linear search is O(n×3) ≈ O(n).
+    for id in &body.project_ids {
+        if !VALID_PROJECT_IDS.contains(&id.as_str()) {
+            return Err(AppError::BadRequest(format!("Unknown project id: {}", id)));
+        }
+    }
+    for id in &body.campaign_ids {
+        if !VALID_CAMPAIGN_IDS.contains(&id.as_str()) {
+            return Err(AppError::BadRequest(format!("Unknown campaign id: {}", id)));
+        }
+    }
+    for id in &body.cluster_ids {
+        if !VALID_CLUSTER_IDS.contains(&id.as_str()) {
+            return Err(AppError::BadRequest(format!("Unknown cluster id: {}", id)));
+        }
     }
 
     log::info!(

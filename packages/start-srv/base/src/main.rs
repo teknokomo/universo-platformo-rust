@@ -5,7 +5,9 @@
 
 use actix_cors::Cors;
 use actix_session::{storage::CookieSessionStore, SessionMiddleware};
-use actix_web::{cookie::Key, cookie::SameSite, middleware::Logger, web, App, HttpServer};
+use actix_web::{
+    cookie::Key, cookie::SameSite, middleware::Logger, web, App, HttpResponse, HttpServer,
+};
 use dotenvy::dotenv;
 
 mod config;
@@ -64,6 +66,12 @@ async fn main() -> std::io::Result<()> {
 
         App::new()
             .app_data(supabase_client.clone())
+            // Return app-consistent {"error":"..."} for malformed JSON bodies
+            .app_data(web::JsonConfig::default().error_handler(|err, _req| {
+                let response = HttpResponse::BadRequest()
+                    .json(serde_json::json!({ "error": format!("Invalid request body: {}", err) }));
+                actix_web::error::InternalError::from_response(err, response).into()
+            }))
             .wrap(Logger::default())
             .wrap(cors)
             .wrap(session_middleware)
