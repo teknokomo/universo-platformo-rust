@@ -1,0 +1,13 @@
+[build]
+# The directory from which assets are served during development
+# Trunk will look for index.html here
+dist = "dist"
+
+[serve]
+# Use port 8081 to avoid conflict with the backend running on 8080
+port = 8081
+
+# Proxy API calls to the backend server during development
+[[proxy]]
+rewrite = "/api"
+backend = "http://localhost:8080/api"

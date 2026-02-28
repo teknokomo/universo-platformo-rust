@@ -49,11 +49,28 @@ Universo Platformo Rust is a project that reimplements the core concepts from Un
 
 -   **Rust + WebAssembly** for high-performance, type-safe frontend (via Yew)
 -   **Actix Web** for a fast, concurrent backend
--   **Supabase integration** for multi-user functionality with abstraction for future DBMS support
+-   **Supabase integration** for authentication, accessed exclusively through the backend
 -   **Monorepo structure** using Cargo workspaces
 -   **Package-based architecture** with clear frontend/backend separation
 
 The project aims to create a unified platform for developing interactive 3D applications that can be exported to various technologies including AR.js, PlayCanvas, Babylon.js, Three.js, and A-Frame, all powered by Rust's performance and safety guarantees.
+
+## Security Architecture
+
+**Supabase is accessed exclusively through the backend.** The frontend never communicates with Supabase directly — all authentication and data operations go through the Actix Web backend:
+
+```
+Browser (Yew/WASM) ──► Actix Web Backend ──► Supabase
+       │                      │
+       └── session cookie     └── JWT (in encrypted HttpOnly cookie)
+```
+
+This design ensures:
+
+-   The Supabase JWT is never exposed to browser JavaScript
+-   All authentication logic is enforced server-side
+-   Session data is stored in encrypted, HttpOnly, SameSite=Lax cookies
+-   The Supabase `anon_key` remains on the server only
 
 ## Relationship to Universo Platformo React
 
@@ -64,74 +81,58 @@ This repository implements the same conceptual foundation as [Universo Platformo
 -   Express → Actix Web (high-performance web framework)
 -   PNPM workspaces → Cargo workspaces
 -   JavaScript/TypeScript → Rust
--   Passport.js → Rust-native authentication solutions
+-   Supabase JS client → reqwest HTTP client (server-side only, never in the browser)
 
 **Important:** This is NOT a direct port. We take the proven concepts from the React implementation and apply Rust ecosystem best practices, avoiding any architectural issues or incomplete features from the React version.
 
 ## Current Status
 
-**Current Phase**: 0.1.0-alpha (November 2025)
+**Current Phase**: 0.1.0-alpha (February 2026)
 
-**Primary Focus:**
+**Implemented:**
 
--   Repository initialization and structure setup
--   Cargo workspace configuration
--   Package structure template (frontend/backend separation)
--   Documentation establishment (bilingual English/Russian)
--   First feature implementation: Clusters (Clusters/Domains/Resources entities)
+-   Repository structure and Cargo workspace configuration
+-   Start page for unauthenticated users: hero, testimonials, login modal (`packages/start-frt`)
+-   Start page for authenticated users: three-step onboarding wizard (`packages/start-frt`)
+-   Supabase authentication backend with encrypted session cookies (`packages/start-srv`)
+-   Onboarding API: Projects / Campaigns / Clusters item selection and completion tracking
+
+**Planned Next:**
+
+-   Clusters feature (Clusters / Domains / Resources entities)
+-   Shared types package (`universo-types`)
+-   Metaverses feature (Metaverses / Sections / Entities)
 
 ## Tech Stack
 
-**Frontend:**
--   Rust (stable)
--   Yew (WebAssembly framework)
--   Material Design components (Rust ecosystem equivalents)
--   Build: Trunk for development, wasm-pack for library builds
--   State Management: Yewdux for global state, use_reducer for local state
+**Frontend (start-frt):**
+-   Rust (stable) compiled to WebAssembly
+-   Yew 0.21 (component-based UI framework)
+-   Yew Router 0.18 (client-side routing)
+-   gloo-net (HTTP fetch API with credentials support for WASM)
+-   wasm-bindgen / wasm-bindgen-futures (JavaScript interop)
+-   Trunk (development server with hot reload and API proxy)
 
-**Backend:**
+**Backend (start-srv):**
 -   Rust (stable)
--   Actix Web
--   Supabase (primary database)
--   Database abstraction layer for future DBMS support
--   SQLx for type-safe database queries
--   actix-web-httpauth for authentication
+-   Actix Web 4 (async HTTP server framework)
+-   actix-session 0.9 with CookieSessionStore (encrypted/signed cookie-based sessions)
+-   actix-cors 0.7 (configurable CORS middleware)
+-   reqwest 0.12 (async HTTP client for Supabase REST API calls)
+-   dotenvy (environment variable loading from .env)
 
-**Development:**
+**Authentication Flow:**
+1. Browser → `POST /api/v1/auth/login` → Backend → Supabase `/auth/v1/token`
+2. Backend stores JWT in encrypted, HttpOnly, SameSite=Lax session cookie
+3. Browser → `GET /api/v1/auth/me` → Backend → Supabase `/auth/v1/user`
+4. Browser → `POST /api/v1/auth/logout` → Backend → Supabase `/auth/v1/logout` + purge session
+
+**Development Tools:**
 -   Cargo workspaces (monorepo management)
 -   rustfmt (code formatting)
 -   clippy (linting)
--   cargo-watch (development automation and hot reload)
--   wasm-bindgen-test (frontend testing)
--   actix-web::test (backend testing)
-
-**Inter-Package Communication:**
--   Shared types in `universo-types` crate with serde traits
--   Compile-time type safety for frontend-backend communication
--   HTTP client in `universo-api-client` crate using reqwest
--   Repository pattern with traits for database abstraction
-
-## Best Practices for Rust Fullstack
-
-This project follows modern Rust fullstack development patterns. For detailed examples and guidance, see:
-
-- **Constitution Principle VII**: Complete Rust ecosystem best practices ([.specify/memory/constitution.md](./.specify/memory/constitution.md))
-- **Architectural Comparison**: Rust technology stack integration guide ([.specify/specs/001-initialize-rust-platformo/ARCHITECTURAL-COMPARISON.md](./.specify/specs/001-initialize-rust-platformo/ARCHITECTURAL-COMPARISON.md))
-
-**Key Patterns**:
-
-1. **Frontend (Yew)**: Function components with hooks (use_state, use_reducer), typed props with Properties trait, HTML macro for templates
-2. **Backend (Actix Web)**: Async handlers, typed extractors (Json<T>, Path<T>), middleware via .wrap()
-3. **Shared Types**: All API contracts and entities in universo-types crate with Serialize/Deserialize traits
-4. **Database**: Repository trait pattern with async_trait, SQLx for compile-time query verification
-5. **Build Tools**: Trunk for frontend dev server with hot reload, cargo-watch for backend
-6. **Testing**: wasm-bindgen-test for Yew components, actix-web::test for API endpoints
-
-**Learning from React Implementation**:
-- Adopt proven shared infrastructure packages (types, utils, api-client, i18n, ui-components)
-- Follow -frt/-srv naming convention with base/ subdirectories
-- Leverage Rust's type system for better compile-time guarantees than TypeScript
-- Use Cargo workspace.dependencies for centralized version management
+-   wasm-bindgen-test (WASM unit tests)
+-   actix-web::test (backend integration tests)
 
 ## Project Structure
 
@@ -139,96 +140,70 @@ This project follows modern Rust fullstack development patterns. For detailed ex
 
 ALL application functionality MUST be implemented as packages in the `packages/` directory. This is a fundamental architectural requirement that cannot be violated.
 
-**What MUST be in packages/**:
-- ✅ All feature implementations (frontend and backend)
-- ✅ All business logic and application code
-- ✅ All UI components
-- ✅ All API endpoints
-- ✅ Shared infrastructure (types, utils, i18n, UI components)
-
-**What is allowed in repository root**:
-- ✅ Cargo.toml (workspace configuration)
-- ✅ rust-toolchain.toml (toolchain specification)
-- ✅ .gitignore, .github/ (repository configuration)
-- ✅ .specify/ (specification workflow)
-- ✅ README files and LICENSE
-
-**What is PROHIBITED in repository root**:
-- ❌ Application source code (NO src/ directory)
-- ❌ Feature implementations
-- ❌ Business logic
-- ❌ UI components
-- ❌ API endpoints
-
-This modular structure ensures that:
-1. Packages can be extracted to separate repositories in the future
-2. Teams can work independently on different packages
-3. Deployment can be done per-package
-4. Code boundaries are clear and enforceable
-
 ```
 universo-platformo-rust/
 ├── packages/                  # ALL APPLICATION CODE MUST BE HERE
-│   ├── universo-types/        # Shared type definitions (PRIORITY: Create first)
+│   ├── start-frt/             # Start page frontend package
 │   │   └── base/
-│   ├── universo-utils/        # Common utilities (PRIORITY: Create first)
-│   │   └── base/
-│   ├── universo-api-client/   # HTTP client (PRIORITY: Create first)
-│   │   └── base/
-│   ├── universo-i18n/         # Internationalization (PRIORITY: Create first)
-│   │   └── base/
-│   ├── universo-ui-components/# Shared UI components (PRIORITY: Create first)
-│   │   └── base/
-│   ├── clusters-frt/          # Clusters frontend (Phase 2)
-│   │   └── base/              # Primary Rust/Yew implementation
-│   ├── clusters-srv/          # Clusters backend (Phase 2)
-│   │   └── base/              # Primary Rust/Actix implementation
-│   ├── [feature]-frt/         # Other frontend packages
-│   └── [feature]-srv/         # Other backend packages
-├── .specify/                  # Specification workflow tools
-│   ├── memory/                # Constitution and project memory
-│   ├── scripts/               # Automation scripts
-│   ├── specs/                 # Feature specifications
-│   │   └── 001-initialize-rust-platformo/
-│   └── templates/             # Document templates
-├── .github/
-│   └── instructions/          # Development guidelines
-│       ├── github-issues.md   # Issue creation standards
-│       ├── github-labels.md   # Label conventions
-│       ├── github-pr.md       # Pull request guidelines
-│       └── i18n-docs.md       # Bilingual documentation rules
-├── Cargo.toml                 # Workspace configuration (NO application code)
+│   │       ├── src/
+│   │       │   ├── api/       # HTTP client (gloo-net, fetch with credentials)
+│   │       │   ├── auth/      # AuthContext, AuthProvider, use_reducer state
+│   │       │   ├── components/# Hero, LoginForm, OnboardingWizard, Footer, etc.
+│   │       │   ├── pages/     # StartPage, GuestStartPage, AuthenticatedStartPage
+│   │       │   ├── app.rs     # Root App component with Yew Router
+│   │       │   └── lib.rs     # WASM entry point (wasm_bindgen start)
+│   │       ├── index.html     # HTML entry point for Trunk
+│   │       ├── styles.css     # Dark theme stylesheet
+│   │       └── Trunk.toml     # Trunk config with API proxy to backend
+│   └── start-srv/             # Start page backend package
+│       └── base/
+│           ├── src/
+│           │   ├── handlers/  # auth.rs (login/logout/me), onboarding.rs
+│           │   ├── config.rs  # AppConfig loaded from environment variables
+│           │   ├── error.rs   # AppError enum with HTTP response conversion
+│           │   ├── models.rs  # Shared request/response data types
+│           │   ├── supabase.rs# Supabase REST API client (sign_in/get_user/sign_out)
+│           │   └── main.rs    # HttpServer setup, routing, middleware stack
+│           └── .env.example   # Environment variable documentation template
+├── Cargo.toml                 # Workspace definition and shared dependencies
 └── README.md                  # This file
 ```
 
-This structure allows for:
-
--   **Mandatory Modularity**: Each feature MUST be contained within its own package(s)
--   **Clear Separation**: Frontend and backend packages are distinct (-frt/-srv suffixes)
--   **Scalability**: New features MUST be added as new packages in packages/
--   **Future Repository Extraction**: Packages are designed to become separate repositories
--   **Future-Proofing**: `base/` subdirectories allow for alternative implementations
+**Architecture Constraints:**
+- ✅ All feature code lives in `packages/`
+- ✅ Frontend only calls `/api/v1/*` endpoints on the backend
+- ✅ Backend is the sole client of the Supabase REST API
+- ❌ No direct Supabase calls from the frontend (browser never touches Supabase)
+- ❌ No application code in the repository root (no `src/` directory)
 
 ## Key Features
 
-### Three-Entity Pattern
+### Authentication and Start Page
 
-Many features in Universo Platformo follow a three-entity hierarchical pattern:
+The first implemented feature provides a complete authentication cycle:
 
--   **Clusters**: Clusters / Domains / Resources
--   **Metaverses**: Metaverses / Sections / Entities
--   **Uniks**: (Extended entity structure)
+-   **Guest landing page**: Hero section, testimonials, "Sign In" / "Get Started" buttons
+-   **Login modal**: Email/password form calling the backend auth endpoint
+-   **Session management**: JWT stored in an encrypted HttpOnly cookie (cookie-based session)
+-   **Authenticated dashboard**: Three-step onboarding wizard displayed after login
+-   **Session restoration**: On every load, `GET /api/v1/auth/me` restores the session
+-   **Logout**: Revokes Supabase token and clears the encrypted cookie session
 
-This pattern provides a consistent approach to organizing hierarchical data and relationships across different feature domains.
+### Three-Entity Onboarding Wizard
 
-### Spaces and Canvases
+The onboarding wizard follows the three-entity hierarchical pattern used across Universo Platformo:
 
-Future development will include the Spaces/Canvases functionality for creating visual node-based workflows:
+-   **Step 1 — Projects** (Global Goals): Sustainability and development initiatives
+-   **Step 2 — Campaigns** (Personal Interests): Education, healthcare, environment topics
+-   **Step 3 — Clusters** (Platform Features): 3D worlds, AR experiences, VR simulations
+-   **Completion screen**: Shown after wizard submission, with option to update preferences
 
--   LangChain graph nodes integration
--   UPDL (Universal Platform Description Language) nodes
--   Visual workflow editor
--   Cross-platform export capabilities
+### Planned Future Features
+
+-   **Clusters**: Full CRUD for Clusters / Domains / Resources entities
+-   **Metaverses**: Metaverses / Sections / Entities management
+-   **Spaces/Canvases**: Visual node-based workflow editor compiled to WebAssembly
+-   **Shared packages**: `universo-types`, `universo-utils`, `universo-api-client`
 
 ## Development Workflow
 
@@ -259,26 +234,45 @@ Future development will include the Spaces/Canvases functionality for creating v
 
 ### Prerequisites
 
--   Rust (stable) - Install via [rustup](https://rustup.rs/)
--   Cargo (comes with Rust)
--   Node.js (for some build tools)
--   Supabase account (for database features)
+-   Rust (stable) — Install via [rustup](https://rustup.rs/)
+-   Trunk — `cargo install trunk`
+-   wasm32 target — `rustup target add wasm32-unknown-unknown`
+-   Supabase account — [supabase.com](https://supabase.com) with an existing user account
 
-### Installation
+### Running the Backend
 
 ```bash
-# Clone the repository
-git clone https://github.com/teknokomo/universo-platformo-rust.git
-cd universo-platformo-rust
+# Go to the backend package directory
+cd packages/start-srv/base
 
-# Build all packages
-cargo build
+# Copy the environment template and fill in your values
+cp .env.example .env
+# Edit .env: set SUPABASE_URL and SUPABASE_ANON_KEY
 
-# Run tests
-cargo test
+# Start the Actix Web server on http://127.0.0.1:8080
+cargo run
+```
 
-# Run with hot-reload during development
-cargo watch -x run
+### Running the Frontend
+
+```bash
+# Go to the frontend package directory
+cd packages/start-frt/base
+
+# Start the Trunk development server (proxies /api requests to localhost:8080)
+trunk serve
+```
+
+Open `http://127.0.0.1:8081` in your browser. The backend (port 8080) and Trunk server (port 8081) must both be running.
+
+### Building for Production
+
+```bash
+# Build the backend binary
+cargo build --release -p start-srv
+
+# Build the frontend WASM bundle
+cd packages/start-frt/base && trunk build --release
 ```
 
 ### Creating a New Feature Package
@@ -319,11 +313,11 @@ We welcome contributions! Please follow these guidelines:
 
 ## License
 
-This project is licensed under the Omsk Open License - see the LICENSE.md file for details.
+This project is licensed under the Omsk Open License — see the LICENSE.md file for details.
 
 ## Related Projects
 
--   [Universo Platformo React](https://github.com/teknokomo/universo-platformo-react) - Original implementation using React/Express
+-   [Universo Platformo React](https://github.com/teknokomo/universo-platformo-react) — Original implementation using React/Express
 -   More Universo projects coming soon across different technology stacks
 
 ---
