@@ -263,7 +263,7 @@ cd packages/start-frt/base
 trunk serve
 ```
 
-Open `http://127.0.0.1:8080` in your browser. The backend and Trunk server must both be running.
+Open `http://127.0.0.1:8081` in your browser. The backend (port 8080) and Trunk server (port 8081) must both be running.
 
 ### Building for Production
 

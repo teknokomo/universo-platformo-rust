@@ -1,7 +1,7 @@
 //! Authentication handlers for login, logout, and session check.
 //!
 //! These handlers communicate with Supabase Auth API and manage
-//! server-side sessions using actix-session cookies.
+//! sessions using actix-session encrypted cookies (CookieSessionStore).
 
 use actix_session::Session;
 use actix_web::{web, HttpResponse};
@@ -16,7 +16,7 @@ use super::{SESSION_ACCESS_TOKEN, SESSION_USER_EMAIL, SESSION_USER_ID};
 /// POST /api/v1/auth/login
 ///
 /// Accepts email/password credentials, authenticates against Supabase,
-/// and stores the session token in a server-side cookie session.
+/// and stores the session token in an encrypted cookie session.
 pub async fn login(
     session: Session,
     supabase: web::Data<SupabaseClient>,

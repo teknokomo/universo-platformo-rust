@@ -38,7 +38,7 @@ pub async fn get_items(session: Session) -> Result<HttpResponse, AppError> {
 
     let onboarding_completed = session
         .get::<bool>(SESSION_ONBOARDING_COMPLETED)
-        .unwrap_or(None)
+        .map_err(|e| AppError::Internal(format!("Session read error: {}", e)))?
         .unwrap_or(false);
 
     // Sample onboarding data - in production this would come from a database

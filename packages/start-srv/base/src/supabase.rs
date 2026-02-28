@@ -32,6 +32,8 @@ pub struct SupabaseUser {
 /// Supabase error response body
 #[derive(Debug, Deserialize)]
 struct SupabaseErrorBody {
+    /// The `error` code returned by Supabase/GoTrue (e.g. `"invalid_grant"`)
+    error: Option<String>,
     message: Option<String>,
     error_description: Option<String>,
     msg: Option<String>,
@@ -92,6 +94,7 @@ impl SupabaseClient {
                     .json::<SupabaseErrorBody>()
                     .await
                     .unwrap_or(SupabaseErrorBody {
+                        error: None,
                         message: Some("Unknown error".to_string()),
                         error_description: None,
                         msg: None,
@@ -99,6 +102,7 @@ impl SupabaseClient {
             let msg = error_body
                 .error_description
                 .or(error_body.message)
+                .or(error_body.error)
                 .or(error_body.msg)
                 .unwrap_or_else(|| "Authentication failed".to_string());
             Err(format!("Supabase auth error ({}): {}", status, msg))
