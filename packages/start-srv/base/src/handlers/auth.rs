@@ -25,14 +25,15 @@ pub async fn login(
     // Server-side input validation.
     // Email is trimmed as leading/trailing whitespace is always unintentional.
     // Password is checked as-is because leading/trailing spaces may be intentional.
-    if body.email.trim().is_empty() || body.password.is_empty() {
+    let email = body.email.trim().to_string();
+    if email.is_empty() || body.password.is_empty() {
         return Err(AppError::BadRequest(
             "Email and password are required".to_string(),
         ));
     }
 
     let auth_response = supabase
-        .sign_in(&body.email, &body.password)
+        .sign_in(&email, &body.password)
         .await
         .map_err(|e| {
             // Map Supabase errors to appropriate HTTP errors
@@ -43,11 +44,11 @@ pub async fn login(
             }
         })?;
 
-    let email = auth_response
+    let user_email = auth_response
         .user
         .email
         .clone()
-        .unwrap_or_else(|| body.email.clone());
+        .unwrap_or_else(|| email.clone());
 
     // Store session data in cookie
     session
@@ -57,16 +58,16 @@ pub async fn login(
         .insert(SESSION_USER_ID, &auth_response.user.id)
         .map_err(|e| AppError::Internal(format!("Session insert error: {}", e)))?;
     session
-        .insert(SESSION_USER_EMAIL, &email)
+        .insert(SESSION_USER_EMAIL, &user_email)
         .map_err(|e| AppError::Internal(format!("Session insert error: {}", e)))?;
 
-    log::info!("User logged in: {}", email);
+    log::info!("User logged in: {}", user_email);
 
     Ok(HttpResponse::Ok().json(json!({
         "message": "Login successful",
         "user": {
             "id": auth_response.user.id,
-            "email": email,
+            "email": user_email,
         }
     })))
 }
@@ -115,10 +116,14 @@ pub async fn me(
         AppError::Unauthorized("Session expired or invalid".to_string())
     })?;
 
-    let email = supabase_user
-        .email
-        .or_else(|| session.get::<String>(SESSION_USER_EMAIL).ok().flatten())
-        .unwrap_or_default();
+    let email = if let Some(email) = supabase_user.email {
+        email
+    } else {
+        session
+            .get::<String>(SESSION_USER_EMAIL)
+            .map_err(|e| AppError::Internal(format!("Session read error: {}", e)))?
+            .unwrap_or_default()
+    };
 
     let user = AuthUser {
         id: supabase_user.id,

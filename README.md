@@ -62,7 +62,7 @@ The project aims to create a unified platform for developing interactive 3D appl
 ```
 Browser (Yew/WASM) ──► Actix Web Backend ──► Supabase
        │                      │
-       └── session cookie     └── JWT (server-side only)
+       └── session cookie     └── JWT (in encrypted HttpOnly cookie)
 ```
 
 This design ensures:
@@ -116,7 +116,7 @@ This repository implements the same conceptual foundation as [Universo Platformo
 **Backend (start-srv):**
 -   Rust (stable)
 -   Actix Web 4 (async HTTP server framework)
--   actix-session 0.9 with CookieSessionStore (encrypted server-side sessions)
+-   actix-session 0.9 with CookieSessionStore (encrypted/signed cookie-based sessions)
 -   actix-cors 0.7 (configurable CORS middleware)
 -   reqwest 0.12 (async HTTP client for Supabase REST API calls)
 -   dotenvy (environment variable loading from .env)
@@ -184,10 +184,10 @@ The first implemented feature provides a complete authentication cycle:
 
 -   **Guest landing page**: Hero section, testimonials, "Sign In" / "Get Started" buttons
 -   **Login modal**: Email/password form calling the backend auth endpoint
--   **Session management**: JWT stored server-side in encrypted HttpOnly cookie
+-   **Session management**: JWT stored in an encrypted HttpOnly cookie (cookie-based session)
 -   **Authenticated dashboard**: Three-step onboarding wizard displayed after login
 -   **Session restoration**: On every load, `GET /api/v1/auth/me` restores the session
--   **Logout**: Revokes Supabase token and purges the server-side session
+-   **Logout**: Revokes Supabase token and clears the encrypted cookie session
 
 ### Three-Entity Onboarding Wizard
 
